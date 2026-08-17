@@ -44,9 +44,9 @@
   /* buttons */
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-200);
-    height:var(--size-control);padding:0 var(--sp-300);border-radius:var(--radius);
-    border:1px solid transparent;font-family:inherit;font-size:16px;font-weight:500;line-height:1;cursor:pointer;
-  }
+    min-height:var(--size-control);padding:var(--sp-200) var(--sp-300);border-radius:var(--radius);
+    border:1px solid transparent;font-family:inherit;font-size:16px;font-weight:500;line-height:1.2;
+    cursor:pointer;white-space:nowrap;text-align:center;}
   .btn-primary{background:var(--bg-brand);border-color:var(--border-brand);color:var(--text-on-brand);}
   .btn-primary:active{background:var(--bg-brand-hover);}
   .btn-neutral{background:var(--bg-tertiary);border-color:var(--border-strong);color:var(--text-default);}
@@ -105,9 +105,9 @@
 
   /* segmented + chips */
   .seg{display:flex;border:1px solid var(--border-default);border-radius:var(--radius);overflow:hidden;}
-  .seg button{flex:1;height:var(--size-control);border:none;border-right:1px solid var(--border-default);
+  .seg button{flex:1;min-height:var(--size-control);border:none;border-right:1px solid var(--border-default);
     background:var(--bg-default);color:var(--text-default);font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:6px;}
+    display:flex;align-items:center;justify-content:center;gap:6px;padding:var(--sp-200) 6px;line-height:1.2;white-space:nowrap;}
   .seg button:last-child{border-right:none;}
   .seg button[aria-pressed="true"]{background:var(--bg-brand);color:var(--text-on-brand);}
   .chips{display:flex;flex-wrap:wrap;gap:var(--sp-200);}
@@ -136,18 +136,26 @@
     color:var(--text-tertiary);margin-bottom:var(--sp-300);}
 
   /* counters */
-  .counters{display:flex;gap:var(--sp-200);}
-  .counter{flex:1;min-width:0;border:1px solid var(--border-default);border-radius:var(--radius);
+  .counters{display:flex;flex-wrap:wrap;gap:var(--sp-200);}
+  .counter{flex:1 1 0;min-width:92px;border:1px solid var(--border-default);border-radius:var(--radius);
     padding:var(--sp-200) 6px;text-align:center;}
+  /* four counters (screens tracked) go 2x2 on phones instead of crushing */
+  @media(max-width:560px){
+    .counters.four .counter{flex:1 1 calc(50% - var(--sp-100));}
+  }
   .counter .lbl{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
     color:var(--text-tertiary);margin-bottom:6px;}
-  .counter .ctrl{display:flex;align-items:center;justify-content:center;gap:2px;}
-  .counter button{width:32px;height:32px;border-radius:var(--radius);border:none;background:var(--bg-secondary);
+  .counter .ctrl{display:flex;align-items:center;justify-content:center;gap:var(--sp-200);}
+  .counter button{width:38px;height:38px;flex-shrink:0;border-radius:var(--radius);border:none;background:var(--bg-secondary);
     color:var(--text-default);display:flex;align-items:center;justify-content:center;cursor:pointer;}
   .counter button:active{background:var(--bg-tertiary);}
-  .counter .num{min-width:26px;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .counter input.num{width:100%;min-width:0;max-width:60px;height:38px;border:1px solid transparent;
+    background:transparent;text-align:center;font-family:inherit;font-size:18px;font-weight:600;
+    font-variant-numeric:tabular-nums;color:inherit;padding:0;border-radius:var(--radius);}
+  .counter input.num:hover{border-color:var(--border-default);}
+  .counter input.num:focus{border-color:var(--accent);background:var(--bg-default);outline:none;}
   .counter.has-count{border-color:var(--accent);background:var(--accent-wash);}
-  .counter.has-count .num{color:var(--accent-ink);}
+  .counter.has-count input.num{color:var(--accent-ink);}
   .counter.has-count .lbl{color:var(--accent-ink);}
 
   /* window type rows */
@@ -174,7 +182,11 @@
   .row .ctrl button{width:36px;height:36px;border-radius:var(--radius);border:1px solid var(--border-default);
     background:var(--bg-default);color:var(--text-default);display:flex;align-items:center;justify-content:center;cursor:pointer;}
   .row .ctrl button:active{background:var(--bg-secondary);}
-  .row .ctrl .num{min-width:24px;text-align:center;font-weight:600;font-variant-numeric:tabular-nums;}
+  .row input.num{width:48px;height:36px;border:1px solid transparent;background:transparent;text-align:center;
+    font-family:inherit;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;color:inherit;
+    padding:0;border-radius:var(--radius);}
+  .row input.num:hover{border-color:var(--border-default);}
+  .row input.num:focus{border-color:var(--accent);background:var(--bg-default);outline:none;}
   .row .amt{width:76px;text-align:right;font-size:14px;color:var(--text-tertiary);font-variant-numeric:tabular-nums;}
 
   /* surface line rows (power washing) */
@@ -293,8 +305,6 @@
     .gutter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-300);}
     .gutter-grid .field{margin-bottom:0;}
     .rate .unit-wrap{width:130px;}
-    .counter .num{min-width:32px;font-size:18px;}
-    .counter button{width:36px;height:36px;}
   }
   /* large tablet / desktop */
   @media(min-width:1024px){
@@ -307,16 +317,18 @@
     .line select{flex:1 1 100%;}
     .line .unit-wrap{flex:1 1 auto;}
   }
+  /* footer buttons need their own line well before 400px now that there are three */
+  @media(max-width:640px){
+    .footer-bar{flex-direction:column;}
+  }
   @media(max-width:400px){
     .card,.svc,.empty{margin-left:var(--sp-300);margin-right:var(--sp-300);}
-    .footer-bar{margin-left:var(--sp-300);margin-right:var(--sp-300);flex-direction:column;}
+    .footer-bar{margin-left:var(--sp-300);margin-right:var(--sp-300);}
+    .status-line{margin-left:var(--sp-300);margin-right:var(--sp-300);}
     .card{padding:var(--sp-300);}
     .svc-head{padding:var(--sp-300);}
     .svc-body{padding:0 var(--sp-300) var(--sp-300);}
-    .counters{gap:6px;}
-    .counter{padding:6px 2px;}
-    .counter button{width:28px;height:28px;}
-    .counter .num{min-width:20px;font-size:16px;}
+    .counter{padding:6px 4px;}
     .counter .lbl{font-size:10px;}
     .totalbar .v{font-size:22px;}
     .brand .logo{width:44px;}
@@ -325,11 +337,6 @@
     .rate{gap:var(--sp-200);}
     .rate .unit-wrap{width:96px;}
     .rate label{font-size:13px;}
-  }
-  /* very narrow: let 4-up counters wrap to two rows instead of crushing */
-  @media(max-width:340px){
-    .counters{flex-wrap:wrap;}
-    .counter{flex:1 1 calc(50% - 3px);}
   }
   /* short landscape phones: dialogs need room */
   @media(max-height:520px){
@@ -557,7 +564,8 @@ function qtyField(field,val,unit,ph){
 function counterHTML(field,label,val){
   return '<div class="counter'+(val>0?' has-count':'')+'"><span class="lbl">'+label+'</span><div class="ctrl">'+
     '<button data-count="'+field+'" data-dir="-1" aria-label="Decrease '+label+'">'+I.minus+'</button>'+
-    '<span class="num">'+val+'</span>'+
+    '<input class="num" type="text" inputmode="numeric" autocomplete="off" data-numinput="'+field+'" '+
+      'value="'+val+'" aria-label="'+label+' count">'+
     '<button data-count="'+field+'" data-dir="1" aria-label="Increase '+label+'">'+I.plus+'</button></div></div>';
 }
 function toggleHTML(field,label,on){
@@ -760,7 +768,7 @@ function inputsHTML(s){
               '<div class="wt-name">'+I.pane+((WIN_SIZES[wt.size]||WIN_SIZES.Standard).title)+'</div>'+
               (tags.length?'<div class="wt-tags">'+tags.map(function(t){return '<span class="tag">'+t+'</span>';}).join('')+'</div>':'')+
             '</div><button class="mini-remove" data-wtdel="'+wt.id+'" aria-label="Remove window type">'+I.trash+'</button></div>'+
-            '<div class="counters">'+keys.map(function(k){ return counterHTML('wt:'+wt.id+':'+k[0], k[1], wt[k[0]]||0); }).join('')+'</div>'+
+            '<div class="counters'+(keys.length>3?' four':'')+'">'+keys.map(function(k){ return counterHTML('wt:'+wt.id+':'+k[0], k[1], wt[k[0]]||0); }).join('')+'</div>'+
             '<div class="wt-foot"><span class="k">Subtotal</span><span class="v">'+fmt(winTypeSubtotal(wt,r))+'</span></div>'+
           '</div>';
         }).join('');
@@ -769,12 +777,12 @@ function inputsHTML(s){
       h += '<div class="svc-section"><div class="svc-label">Other items</div>'+
         '<div class="row"><div class="label">'+I.mirror+'Mirrors</div><div class="ctrl">'+
           '<button data-count="mirrors" data-dir="-1" aria-label="Fewer mirrors">'+I.minus+'</button>'+
-          '<span class="num">'+(d.mirrors||0)+'</span>'+
+          '<input class="num" type="text" inputmode="numeric" autocomplete="off" data-numinput="mirrors" value="'+(d.mirrors||0)+'" aria-label="Mirror count">'+
           '<button data-count="mirrors" data-dir="1" aria-label="More mirrors">'+I.plus+'</button></div>'+
           '<div class="amt">'+fmt((d.mirrors||0)*n(r.mirror))+'</div></div>'+
         '<div class="row"><div class="label">'+I.sky+'Skylights</div><div class="ctrl">'+
           '<button data-count="skylights" data-dir="-1" aria-label="Fewer skylights">'+I.minus+'</button>'+
-          '<span class="num">'+(d.skylights||0)+'</span>'+
+          '<input class="num" type="text" inputmode="numeric" autocomplete="off" data-numinput="skylights" value="'+(d.skylights||0)+'" aria-label="Skylight count">'+
           '<button data-count="skylights" data-dir="1" aria-label="More skylights">'+I.plus+'</button></div>'+
           '<div class="amt">'+fmt((d.skylights||0)*n(r.skylight))+'</div></div></div>';
       break;
@@ -877,6 +885,25 @@ function ratesHTML(s){
   return h;
 }
 
+function getCount(s, key){
+  if(key.indexOf('wt:') === 0){
+    var p = key.split(':');
+    var wt = s.data.types.find(function(t){ return t.id === parseInt(p[1]); });
+    return wt ? (wt[p[2]]||0) : 0;
+  }
+  return s.data[key]||0;
+}
+function setCount(s, key, val){
+  val = Math.max(0, Math.min(9999, val|0));
+  if(key.indexOf('wt:') === 0){
+    var p = key.split(':');
+    var wt = s.data.types.find(function(t){ return t.id === parseInt(p[1]); });
+    if(wt) wt[p[2]] = val;
+  } else {
+    s.data[key] = val;
+  }
+}
+
 /* ============ render ============ */
 var svcList = document.getElementById('svcList');
 
@@ -964,15 +991,8 @@ svcList.addEventListener('click', function(e){
     render(); return;
   }
   if(btn.dataset.count){
-    var d = parseInt(btn.dataset.dir);
     var key = btn.dataset.count;
-    if(key.indexOf('wt:') === 0){
-      var parts = key.split(':');
-      var wt = s.data.types.find(function(t){ return t.id === parseInt(parts[1]); });
-      if(wt) wt[parts[2]] = Math.max(0,(wt[parts[2]]||0) + d);
-    } else {
-      s.data[key] = Math.max(0,(s.data[key]||0) + d);
-    }
+    setCount(s, key, getCount(s, key) + parseInt(btn.dataset.dir));
     render(); return;
   }
   // segmented toggles inside service body
@@ -989,7 +1009,21 @@ svcList.addEventListener('input', function(e){
   var el = e.target;
   var s = findSvc(el);
   if(!s) return;
-  if(el.hasAttribute('data-notes')){ s.notes = el.value; return; }
+  if(el.dataset.numinput){
+    var key = el.dataset.numinput;
+    var digits = el.value.replace(/[^0-9]/g,'').slice(0,4);
+    setCount(s, key, digits === '' ? 0 : parseInt(digits,10));
+    render();
+    // put the caret back where the rep left it
+    var again = svcList.querySelector('[data-svc="'+s.id+'"] [data-numinput="'+key+'"]');
+    if(again){
+      again.focus();
+      if(digits === '') again.value = '';
+      try { again.setSelectionRange(again.value.length, again.value.length); } catch(err){}
+    }
+    return;
+  }
+  if(el.hasAttribute('data-notes')){ s.notes = el.value; saveDraft(); return; }
   if(el.dataset.rate){ s.rates[el.dataset.rate] = el.value; updateTotals(); return; }
   if(el.dataset.field){ s.data[el.dataset.field] = el.value; updateTotals(); return; }
   if(el.dataset.line){
@@ -997,6 +1031,19 @@ svcList.addEventListener('input', function(e){
     if(l){ l[el.dataset.lfield] = el.value; updateTotals(); }
   }
 });
+/* tapping a count selects it so typing replaces rather than appends */
+svcList.addEventListener('focusin', function(e){
+  if(e.target.dataset && e.target.dataset.numinput){
+    var el = e.target;
+    setTimeout(function(){ try{ el.select(); }catch(err){} }, 0);
+  }
+});
+svcList.addEventListener('focusout', function(e){
+  if(e.target.dataset && e.target.dataset.numinput && e.target.value === ''){
+    e.target.value = '0';
+  }
+});
+
 svcList.addEventListener('change', function(e){
   var el = e.target;
   if(el.tagName !== 'SELECT') return;
