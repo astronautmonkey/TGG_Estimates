@@ -139,9 +139,14 @@
   .counters{display:flex;flex-wrap:wrap;gap:var(--sp-200);}
   .counter{flex:1 1 0;min-width:92px;border:1px solid var(--border-default);border-radius:var(--radius);
     padding:var(--sp-200) 6px;text-align:center;}
-  /* four counters (screens tracked) go 2x2 on phones instead of crushing */
-  @media(max-width:560px){
-    .counters.four .counter{flex:1 1 calc(50% - var(--sp-100));}
+  /* on phones each count gets its own full-width row: label left, controls right */
+  @media(max-width:600px){
+    .counters{flex-direction:column;flex-wrap:nowrap;gap:6px;}
+    .counter{flex:none;width:100%;display:flex;align-items:center;justify-content:space-between;
+      gap:var(--sp-300);padding:5px 6px 5px var(--sp-300);text-align:left;}
+    .counter .lbl{margin-bottom:0;font-size:12px;}
+    .counter .ctrl{gap:var(--sp-300);}
+    .counter input.num{max-width:56px;}
   }
   .counter .lbl{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
     color:var(--text-tertiary);margin-bottom:6px;}
@@ -768,8 +773,8 @@ function inputsHTML(s){
               '<div class="wt-name">'+I.pane+((WIN_SIZES[wt.size]||WIN_SIZES.Standard).title)+'</div>'+
               (tags.length?'<div class="wt-tags">'+tags.map(function(t){return '<span class="tag">'+t+'</span>';}).join('')+'</div>':'')+
             '</div><button class="mini-remove" data-wtdel="'+wt.id+'" aria-label="Remove window type">'+I.trash+'</button></div>'+
-            '<div class="counters'+(keys.length>3?' four':'')+'">'+keys.map(function(k){ return counterHTML('wt:'+wt.id+':'+k[0], k[1], wt[k[0]]||0); }).join('')+'</div>'+
-            '<div class="wt-foot"><span class="k">Subtotal</span><span class="v">'+fmt(winTypeSubtotal(wt,r))+'</span></div>'+
+            '<div class="counters">'+keys.map(function(k){ return counterHTML('wt:'+wt.id+':'+k[0], k[1], wt[k[0]]||0); }).join('')+'</div>'+
+            '<div class="wt-foot"><span class="k">Subtotal</span><span class="v" data-wtsub="'+wt.id+'">'+fmt(winTypeSubtotal(wt,r))+'</span></div>'+
           '</div>';
         }).join('');
       }
@@ -779,12 +784,12 @@ function inputsHTML(s){
           '<button data-count="mirrors" data-dir="-1" aria-label="Fewer mirrors">'+I.minus+'</button>'+
           '<input class="num" type="text" inputmode="numeric" autocomplete="off" data-numinput="mirrors" value="'+(d.mirrors||0)+'" aria-label="Mirror count">'+
           '<button data-count="mirrors" data-dir="1" aria-label="More mirrors">'+I.plus+'</button></div>'+
-          '<div class="amt">'+fmt((d.mirrors||0)*n(r.mirror))+'</div></div>'+
+          '<div class="amt" data-amt="mirrors">'+fmt((d.mirrors||0)*n(r.mirror))+'</div></div>'+
         '<div class="row"><div class="label">'+I.sky+'Skylights</div><div class="ctrl">'+
           '<button data-count="skylights" data-dir="-1" aria-label="Fewer skylights">'+I.minus+'</button>'+
           '<input class="num" type="text" inputmode="numeric" autocomplete="off" data-numinput="skylights" value="'+(d.skylights||0)+'" aria-label="Skylight count">'+
           '<button data-count="skylights" data-dir="1" aria-label="More skylights">'+I.plus+'</button></div>'+
-          '<div class="amt">'+fmt((d.skylights||0)*n(r.skylight))+'</div></div></div>';
+          '<div class="amt" data-amt="skylights">'+fmt((d.skylights||0)*n(r.skylight))+'</div></div></div>';
       break;
     }
     case 'soft':
@@ -957,6 +962,23 @@ function updateTotals(){
   if(typeof saveDraft === 'function') saveDraft();
 }
 
+/* Update the money on screen without rebuilding the DOM, so a field
+   being typed into keeps its focus, caret, and partially entered value. */
+function refreshFigures(s){
+  var host = svcList.querySelector('[data-svc="'+s.id+'"]');
+  if(host && s.type === 'window'){
+    s.data.types.forEach(function(wt){
+      var e = host.querySelector('[data-wtsub="'+wt.id+'"]');
+      if(e) e.textContent = fmt(winTypeSubtotal(wt, s.rates));
+    });
+    var m = host.querySelector('[data-amt="mirrors"]');
+    if(m) m.textContent = fmt((s.data.mirrors||0) * n(s.rates.mirror));
+    var k = host.querySelector('[data-amt="skylights"]');
+    if(k) k.textContent = fmt((s.data.skylights||0) * n(s.rates.skylight));
+  }
+  updateTotals();
+}
+
 function findSvc(el){
   var host = el.closest('[data-svc]');
   return host ? services.find(function(s){ return s.id === parseInt(host.dataset.svc); }) : null;
@@ -1010,25 +1032,25 @@ svcList.addEventListener('input', function(e){
   var s = findSvc(el);
   if(!s) return;
   if(el.dataset.numinput){
-    var key = el.dataset.numinput;
     var digits = el.value.replace(/[^0-9]/g,'').slice(0,4);
-    setCount(s, key, digits === '' ? 0 : parseInt(digits,10));
-    render();
-    // put the caret back where the rep left it
-    var again = svcList.querySelector('[data-svc="'+s.id+'"] [data-numinput="'+key+'"]');
-    if(again){
-      again.focus();
-      if(digits === '') again.value = '';
-      try { again.setSelectionRange(again.value.length, again.value.length); } catch(err){}
+    if(digits !== el.value){
+      // strip anything non-numeric without disturbing the caret position
+      var pos = el.selectionStart - (el.value.length - digits.length);
+      el.value = digits;
+      try { el.setSelectionRange(pos, pos); } catch(err){}
     }
+    setCount(s, el.dataset.numinput, digits === '' ? 0 : parseInt(digits,10));
+    var cell = el.closest('.counter');
+    if(cell) cell.classList.toggle('has-count', digits !== '' && parseInt(digits,10) > 0);
+    refreshFigures(s);
     return;
   }
   if(el.hasAttribute('data-notes')){ s.notes = el.value; saveDraft(); return; }
-  if(el.dataset.rate){ s.rates[el.dataset.rate] = el.value; updateTotals(); return; }
-  if(el.dataset.field){ s.data[el.dataset.field] = el.value; updateTotals(); return; }
+  if(el.dataset.rate){ s.rates[el.dataset.rate] = el.value; refreshFigures(s); return; }
+  if(el.dataset.field){ s.data[el.dataset.field] = el.value; refreshFigures(s); return; }
   if(el.dataset.line){
     var l = s.data.lines.find(function(x){ return x.id === parseInt(el.dataset.line); });
-    if(l){ l[el.dataset.lfield] = el.value; updateTotals(); }
+    if(l){ l[el.dataset.lfield] = el.value; refreshFigures(s); }
   }
 });
 /* tapping a count selects it so typing replaces rather than appends */
