@@ -1171,7 +1171,9 @@ svcList.addEventListener('click', function(e){
   if(segHost){
     Array.prototype.forEach.call(segHost.children, function(x){ x.setAttribute('aria-pressed','false'); });
     btn.setAttribute('aria-pressed','true');
-    s.data[segHost.dataset.seg] = parseInt(btn.dataset.val);
+    // Yes/No toggles carry 0/1; garage and roof material carry text labels.
+    var raw = btn.dataset.val;
+    s.data[segHost.dataset.seg] = /^-?\d+$/.test(raw) ? parseInt(raw,10) : raw;
     render(); return;
   }
 });
@@ -1180,6 +1182,7 @@ svcList.addEventListener('input', function(e){
   var el = e.target;
   var s = findSvc(el);
   if(!s) return;
+  if(el.tagName === 'SELECT') return; // selects are handled on 'change' so the UI can redraw
   if(el.dataset.numinput){
     var digits = el.value.replace(/[^0-9]/g,'').slice(0,4);
     if(digits !== el.value){
@@ -1219,9 +1222,15 @@ svcList.addEventListener('change', function(e){
   var el = e.target;
   if(el.tagName !== 'SELECT') return;
   var s = findSvc(el); if(!s) return;
+  if(el.dataset.field){
+    // e.g. accessory building type — changing it shows or hides its quantity counter
+    s.data[el.dataset.field] = el.value;
+    render(); return;
+  }
   if(el.dataset.line){
     var l = s.data.lines.find(function(x){ return x.id === parseInt(el.dataset.line); });
-    if(l){ l[el.dataset.lfield] = el.value; updateTotals(); }
+    // surface choice changes the unit label (sq ft vs lin ft), so redraw rather than just retotal
+    if(l){ l[el.dataset.lfield] = el.value; render(); }
   }
 });
 
