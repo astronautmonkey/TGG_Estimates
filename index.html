@@ -509,6 +509,17 @@
         <label>Pane size</label>
         <div class="seg" id="segSize"></div>
       </div>
+      <div class="field" id="fieldGrids" style="display:none;">
+        <label>Grids per window</label>
+        <div class="chips" id="gridPresets"></div>
+        <div style="margin-top:8px;"><input type="number" id="gridsCustom" inputmode="numeric" min="1" max="99" placeholder="Or enter a number" value="6"></div>
+      </div>
+
+      <div class="field" id="fieldStyle">
+        <label>Style</label>
+        <div class="seg" id="segStyle"></div>
+      </div>
+
       <div class="field">
         <label>Features, tap all that apply</label>
         <div class="chips" id="chipTypes"></div>
@@ -551,6 +562,7 @@ var I = {
   deck:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18M3 13h18M3 18h18"/><path d="M6 4v16M18 4v16"/></svg>',
   dryer:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4.5"/><path d="M8 6h2"/></svg>',
   duct:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M7 9h10M7 12h10M7 15h10"/></svg>',
+  chimney:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l9-7 9 7"/><path d="M5 12v9h14v-9"/><path d="M16 8V4h3v6"/><path d="M17.5 2.5c0-.8-1-.8-1 0s1 .8 1 1.6"/></svg>',
   mirror:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="10" rx="6" ry="8"/><path d="M9 21h6M12 18v3"/></svg>',
   sky:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   emptyDoc:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6M9 15h6"/></svg>'
@@ -588,35 +600,74 @@ var CATALOG = {
   gutter:{ label:'Gutter Cleaning', icon:I.gutter, blurb:'Linear feet by story' },
   deck:{ label:'Deck Restoration', icon:I.deck, blurb:'Square footage, railings, stairs' },
   dryer:{ label:'Dryer Vents', icon:I.dryer, blurb:'Vent count, ladder access' },
-  duct:{ label:'Air Ducts', icon:I.duct, blurb:'Registers and furnace systems' }
+  duct:{ label:'Air Ducts', icon:I.duct, blurb:'Registers and furnace systems' },
+  chimney:{ label:'Chimney Cleaning', icon:I.chimney, blurb:'Number of flues' }
 };
 
 var DEFAULTS = {
   window:{
     data:{ types:[], mirrors:0, skylights:0, nextTypeId:1 },
-    rates:{ r1:7, r2:9, r3:11, xl:1.5, g1:2, g2:2.5, g3:3, snap:3, storm:3, pella:4, interiorPct:60, screen:2, mirror:5, skylight:20 }
+    rates:{ r1:7, r2:9, r3:11, xl:1.5, g1:2, g2:2.5, g3:3,
+            dh:0, csmt:0, snap:3, storm:3, pella:4,
+            interiorPct:60, screen:2, mirror:5, skylight:20 }
   },
-  soft:{ data:{ sqft:'' }, rates:{ perSqft:0.25, min:275 } },
-  roof:{ data:{ sqft:'' }, rates:{ perSqft:0.45, min:450 } },
+  soft:{ data:{ sqft:'', garage:'None', acc:'None', accQty:0 },
+         rates:{ perSqft:0.25, garAttached:75, garDetached:125,
+                 accShed:75, accPoleBarn:200, accOther:125, min:275 } },
+  roof:{ data:{ sqft:'', material:'Asphalt', garage:'None', acc:'None', accQty:0 },
+         rates:{ matAsphalt:0.50, matCedar:1.00, matSteel:0.50,
+                 garAttached:125, garDetached:175,
+                 accShed:125, accPoleBarn:300, accOther:200, min:450 } },
   power:{ data:{ lines:[{id:1,surface:'Driveway',sqft:''}], nextLineId:2 },
-          rates:{ Driveway:0.22, 'Walkway / Sidewalk':0.25, Patio:0.28, 'Deck / Porch':0.35, 'Garage / Slab':0.22, Other:0.30, min:200 } },
-  gutter:{ data:{ ft1:'', ft2:'', ft3:'' }, rates:{ r1:1.75, r2:2.25, r3:3, min:150 } },
-  deck:{ data:{ sqft:'', railings:0, stairs:0 }, rates:{ perSqft:3.5, railPct:20, stairPct:10, min:400 } },
+          rates:{ Driveway:0.22, 'Walkway / Sidewalk':0.25, Patio:0.28,
+                  'Paver brick / stone':0.75, 'Wood deck':1.50, 'Composite deck':0.35,
+                  'Wood railings':5.00, 'Composite railings':2.50,
+                  'Garage / Slab':0.22, Other:0.30, min:200 } },
+  gutter:{ data:{ ft1:'', ft2:'', ft3:'', interior:1, wash:0 },
+           rates:{ r1:1.75, r2:2.25, r3:3, intMult:1, washMult:0.5, min:150 } },
+  deck:{ data:{ sqft:'', railFt:'', stairs:'' }, rates:{ perSqft:3.5, railPerFt:40, perStair:35, min:400 } },
   dryer:{ data:{ standard:0, ladder:0 }, rates:{ perVent:135, ladderAdd:45 } },
-  duct:{ data:{ registers:0, furnaces:1 }, rates:{ perRegister:35, perSystem:150, min:400 } }
+  duct:{ data:{ registers:0, furnaces:1 }, rates:{ perRegister:35, perSystem:150, min:400 } },
+  chimney:{ data:{ flues:0 }, rates:{ perFlue:250, min:250 } }
 };
+
+var GARAGE_OPTS = [['None','None'],['Attached','garAttached'],['Detached','garDetached']];
+var ACC_OPTS = [['None','None'],['Shed','accShed'],['Pole barn','accPoleBarn'],['Other','accOther']];
+var ROOF_MATERIALS = [['Asphalt','matAsphalt'],['Cedar','matCedar'],['Steel','matSteel']];
+
+function garageAdd(d,r){
+  var o = GARAGE_OPTS.find(function(x){ return x[0] === d.garage; });
+  return (o && o[1] !== 'None') ? n(r[o[1]]) : 0;
+}
+function accAdd(d,r){
+  var o = ACC_OPTS.find(function(x){ return x[0] === d.acc; });
+  return (o && o[1] !== 'None') ? n(d.accQty) * n(r[o[1]]) : 0;
+}
+function roofRate(d,r){
+  var m = ROOF_MATERIALS.find(function(x){ return x[0] === d.material; });
+  return m ? n(r[m[1]]) : 0;
+}
 
 var WIN_FEATURES = [
   {k:'SnapMuntin', label:'Snap-in muntins', rate:'snap', short:'Snap muntins'},
   {k:'Storm', label:'Storm window', rate:'storm', short:'Storm'},
   {k:'PellaStorm', label:'Pella storm', rate:'pella', short:'Pella storm'}
 ];
+var WIN_STYLES = [
+  {k:'', label:'Not specified', rate:null, short:''},
+  {k:'DoubleHung', label:'Double hung', rate:'dh', short:'Double hung'},
+  {k:'Casement', label:'Casement', rate:'csmt', short:'Casement'}
+];
+var GRID_PRESETS = [4,6,8,12];
 var WIN_SIZES = {
   Standard:{ label:'Standard', title:'Standard pane' },
   XL:{ label:'XL', title:'XL pane' },
-  Grid:{ label:'Grid', title:'Grid / mullion pane' }
+  Grid:{ label:'Grid', title:'Grid window' }
 };
-var POWER_SURFACES = ['Driveway','Walkway / Sidewalk','Patio','Deck / Porch','Garage / Slab','Other'];
+var POWER_SURFACES = ['Driveway','Walkway / Sidewalk','Patio','Paver brick / stone',
+  'Wood deck','Composite deck','Wood railings','Composite railings','Garage / Slab','Other'];
+var POWER_UNITS = { 'Wood railings':'lin ft', 'Composite railings':'lin ft' };
+function powerUnit(sf){ return POWER_UNITS[sf] || 'sq ft'; }
 
 /* ============ state ============ */
 var services = [];
@@ -626,6 +677,7 @@ function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function n(v){ var x = parseFloat(v); return isNaN(x) ? 0 : x; }
 
 /* ============ calculations ============ */
+/* Price for one counted unit: a pane for standard/XL, a whole window for grid types. */
 function winPanePrice(wt, floor, r){
   var add = wt.features.reduce(function(s,k){
     var f = WIN_FEATURES.find(function(x){return x.k===k;});
@@ -633,12 +685,17 @@ function winPanePrice(wt, floor, r){
   },0);
   if(wt.size === 'Grid'){
     var g = floor==='f1'? n(r.g1) : floor==='f2'? n(r.g2) : n(r.g3);
-    return g + add;
+    return g * (wt.gridsPer || 1) + add;
   }
+  var st = WIN_STYLES.find(function(x){ return x.k === (wt.style||''); });
+  var styleAdd = (st && st.rate) ? n(r[st.rate]) : 0;
   var base = floor==='f1'? n(r.r1) : floor==='f2'? n(r.r2) : n(r.r3);
-  return (base + add) * (wt.size==='XL' ? n(r.xl) : 1);
+  return (base + add + styleAdd) * (wt.size==='XL' ? n(r.xl) : 1);
 }
-function winTypePanes(wt){ return (wt.f1||0)+(wt.f2||0)+(wt.f3||0); }
+function winTypeUnits(wt){ return (wt.f1||0)+(wt.f2||0)+(wt.f3||0); }
+function winTypePanes(wt){
+  return winTypeUnits(wt) * (wt.size==='Grid' ? (wt.gridsPer||1) : 1);
+}
 function winTypeSubtotal(wt, r){
   return ['f1','f2','f3'].reduce(function(s,f){ return s + winPanePrice(wt,f,r)*(wt[f]||0); },0)
        + (wt.screens||0)*n(r.screen);
@@ -662,27 +719,35 @@ function svcTotal(s){
   var d = s.data, r = s.rates;
   switch(s.type){
     case 'window': return winParts(s).total;
-    case 'soft':   return withMin(n(d.sqft)*n(r.perSqft), r.min, n(d.sqft)>0);
-    case 'roof':   return withMin(n(d.sqft)*n(r.perSqft), r.min, n(d.sqft)>0);
+    case 'soft': {
+      var rawS = n(d.sqft)*n(r.perSqft) + garageAdd(d,r) + accAdd(d,r);
+      return withMin(rawS, r.min, n(d.sqft)>0 || garageAdd(d,r)>0 || accAdd(d,r)>0);
+    }
+    case 'roof': {
+      var rawR = n(d.sqft)*roofRate(d,r) + garageAdd(d,r) + accAdd(d,r);
+      return withMin(rawR, r.min, n(d.sqft)>0 || garageAdd(d,r)>0 || accAdd(d,r)>0);
+    }
     case 'power':  {
       var raw = d.lines.reduce(function(a,l){ return a + n(l.sqft)*n(r[l.surface]); },0);
       var any = d.lines.some(function(l){ return n(l.sqft)>0; });
       return withMin(raw, r.min, any);
     }
     case 'gutter': {
-      var raw2 = n(d.ft1)*n(r.r1) + n(d.ft2)*n(r.r2) + n(d.ft3)*n(r.r3);
-      return withMin(raw2, r.min, (n(d.ft1)+n(d.ft2)+n(d.ft3))>0);
+      var baseFt = n(d.ft1)*n(r.r1) + n(d.ft2)*n(r.r2) + n(d.ft3)*n(r.r3);
+      var raw2 = baseFt * ((d.interior ? n(r.intMult) : 0) + (d.wash ? n(r.washMult) : 0));
+      var anyFt = (n(d.ft1)+n(d.ft2)+n(d.ft3)) > 0;
+      return withMin(raw2, r.min, anyFt && (d.interior || d.wash));
     }
     case 'deck': {
-      var base = n(d.sqft)*n(r.perSqft);
-      var mult = 1 + (d.railings? n(r.railPct)/100 : 0) + (d.stairs? n(r.stairPct)/100 : 0);
-      return withMin(base*mult, r.min, n(d.sqft)>0);
+      var rawDeck = n(d.sqft)*n(r.perSqft) + n(d.railFt)*n(r.railPerFt) + n(d.stairs)*n(r.perStair);
+      return withMin(rawDeck, r.min, n(d.sqft)>0 || n(d.railFt)>0 || n(d.stairs)>0);
     }
     case 'dryer':  return (n(d.standard)+n(d.ladder))*n(r.perVent) + n(d.ladder)*n(r.ladderAdd);
     case 'duct': {
       var raw3 = n(d.registers)*n(r.perRegister) + n(d.furnaces)*n(r.perSystem);
       return withMin(raw3, r.min, n(d.registers)>0);
     }
+    case 'chimney': return withMin(n(d.flues)*n(r.perFlue), r.min, n(d.flues)>0);
   }
   return 0;
 }
@@ -703,38 +768,57 @@ function breakdownHTML(s){
       break;
     }
     case 'soft': case 'roof': {
-      var raw = n(d.sqft)*n(r.perSqft);
-      rows += bdRow(s.type==='roof'?'Roof area':'House exterior', n(d.sqft).toLocaleString()+' sq ft \u00d7 '+fmt(n(r.perSqft)), raw);
-      if(n(d.sqft)>0 && raw < n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-raw);
+      var isRoof = s.type === 'roof';
+      var perSq = isRoof ? roofRate(d,r) : n(r.perSqft);
+      var rawM = 0;
+      if(n(d.sqft)>0){ var vh = n(d.sqft)*perSq; rawM += vh;
+        rows += bdRow(isRoof ? 'Roof area \u00b7 '+d.material : 'House exterior',
+          n(d.sqft).toLocaleString()+' sq ft \u00d7 '+fmt(perSq), vh); }
+      var g = garageAdd(d,r);
+      if(g>0){ rawM += g; rows += bdRow('Garage', d.garage, g); }
+      var a = accAdd(d,r);
+      if(a>0){ rawM += a; rows += bdRow(d.acc, n(d.accQty)+' \u00d7 '+fmt(a/Math.max(1,n(d.accQty))), a); }
+      if(!rows){ rows = bdRow('Nothing measured yet','',0); break; }
+      if(rawM>0 && rawM<n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-rawM);
       break;
     }
     case 'power': {
       var rawp = 0;
       d.lines.forEach(function(l){
         if(n(l.sqft)>0){ var v = n(l.sqft)*n(r[l.surface]); rawp+=v;
-          rows += bdRow(l.surface, n(l.sqft).toLocaleString()+' sq ft \u00d7 '+fmt(n(r[l.surface])), v); }
+          rows += bdRow(l.surface, n(l.sqft).toLocaleString()+' '+powerUnit(l.surface)+' \u00d7 '+fmt(n(r[l.surface])), v); }
       });
       if(rawp>0 && rawp < n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-rawp);
       if(!rows) rows = bdRow('No surfaces entered','',0);
       break;
     }
     case 'gutter': {
-      var rawg=0;
-      [['ft1','1st story','r1'],['ft2','2nd story','r2'],['ft3','3rd story','r3']].forEach(function(x){
-        if(n(d[x[0]])>0){ var v=n(d[x[0]])*n(r[x[2]]); rawg+=v;
-          rows += bdRow(x[1], n(d[x[0]])+' lin ft \u00d7 '+fmt(n(r[x[2]])), v); }
+      var parts=[], tot=0;
+      [['ft1','1st','r1'],['ft2','2nd','r2'],['ft3','3rd','r3']].forEach(function(x){
+        if(n(d[x[0]])>0){ tot += n(d[x[0]]); parts.push(x[1]+' '+n(d[x[0]])+' ft @ '+fmt(n(r[x[2]]))); }
       });
+      var baseFt = n(d.ft1)*n(r.r1) + n(d.ft2)*n(r.r2) + n(d.ft3)*n(r.r3);
+      if(!parts.length){ rows = bdRow('No footage entered','',0); break; }
+      var detail = parts.join(' \u00b7 ');
+      var rawg = 0;
+      if(d.interior){ var vi = baseFt*n(r.intMult); rawg += vi;
+        rows += bdRow('Interior debris cleanout', detail + ' \u00d7 ' + n(r.intMult), vi); }
+      if(d.wash){ var vw = baseFt*n(r.washMult); rawg += vw;
+        rows += bdRow('Exterior gutter wash', detail + ' \u00d7 ' + n(r.washMult), vw); }
+      if(!d.interior && !d.wash) rows += bdRow('No gutter service selected', tot+' lin ft measured', 0);
       if(rawg>0 && rawg<n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-rawg);
-      if(!rows) rows = bdRow('No footage entered','',0);
       break;
     }
     case 'deck': {
-      var base = n(d.sqft)*n(r.perSqft);
-      rows += bdRow('Deck surface', n(d.sqft).toLocaleString()+' sq ft \u00d7 '+fmt(n(r.perSqft)), base);
-      if(d.railings) rows += bdRow('Railings','+'+n(r.railPct)+'%', base*n(r.railPct)/100);
-      if(d.stairs) rows += bdRow('Stairs','+'+n(r.stairPct)+'%', base*n(r.stairPct)/100);
-      var tot = base*(1+(d.railings?n(r.railPct)/100:0)+(d.stairs?n(r.stairPct)/100:0));
-      if(n(d.sqft)>0 && tot<n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-tot);
+      var rawDeck = 0;
+      if(n(d.sqft)>0){ var vs = n(d.sqft)*n(r.perSqft); rawDeck += vs;
+        rows += bdRow('Deck surface', n(d.sqft).toLocaleString()+' sq ft \u00d7 '+fmt(n(r.perSqft)), vs); }
+      if(n(d.railFt)>0){ var vr = n(d.railFt)*n(r.railPerFt); rawDeck += vr;
+        rows += bdRow('Railings', n(d.railFt)+' lin ft \u00d7 '+fmt(n(r.railPerFt)), vr); }
+      if(n(d.stairs)>0){ var vst = n(d.stairs)*n(r.perStair); rawDeck += vst;
+        rows += bdRow('Stairs', n(d.stairs)+' \u00d7 '+fmt(n(r.perStair)), vst); }
+      if(!rows){ rows = bdRow('Nothing measured yet','',0); break; }
+      if(rawDeck>0 && rawDeck<n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-rawDeck);
       break;
     }
     case 'dryer': {
@@ -748,6 +832,12 @@ function breakdownHTML(s){
       rows += bdRow('Furnace systems', n(d.furnaces)+' \u00d7 '+fmt(n(r.perSystem)), n(d.furnaces)*n(r.perSystem));
       var rawd = n(d.registers)*n(r.perRegister)+n(d.furnaces)*n(r.perSystem);
       if(rawd>0 && rawd<n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-rawd);
+      break;
+    }
+    case 'chimney': {
+      var rawc = n(d.flues)*n(r.perFlue);
+      rows += bdRow('Flues', n(d.flues)+' \u00d7 '+fmt(n(r.perFlue)), rawc);
+      if(rawc>0 && rawc<n(r.min)) rows += bdRow('Minimum applied','',n(r.min)-rawc);
       break;
     }
   }
@@ -765,12 +855,18 @@ function inputsHTML(s){
       } else {
         h += d.types.map(function(wt){
           var tags=[];
+          var stl = WIN_STYLES.find(function(x){ return x.k === (wt.style||''); });
+          if(stl && stl.short) tags.push(stl.short);
           wt.features.forEach(function(k){ var f=WIN_FEATURES.find(function(x){return x.k===k;}); if(f) tags.push(f.short); });
+          var title = (WIN_SIZES[wt.size]||WIN_SIZES.Standard).title;
+          if(wt.size === 'Grid') title += ' \u00b7 ' + (wt.gridsPer||1) + ' lites';
+          var unitWord = wt.size === 'Grid' ? 'windows' : 'panes';
           var keys = [['f1','1st'],['f2','2nd'],['f3','3rd']];
           if(wt.screensEnabled) keys.push(['screens','Screens']);
           return '<div class="wt">'+
             '<div class="wt-head"><div>'+
-              '<div class="wt-name">'+I.pane+((WIN_SIZES[wt.size]||WIN_SIZES.Standard).title)+'</div>'+
+              '<div class="wt-name">'+I.pane+title+'</div>'+
+              '<div class="wt-sub" style="font-size:12px;color:var(--text-tertiary);margin-top:2px;">counting '+unitWord+'</div>'+
               (tags.length?'<div class="wt-tags">'+tags.map(function(t){return '<span class="tag">'+t+'</span>';}).join('')+'</div>':'')+
             '</div><button class="mini-remove" data-wtdel="'+wt.id+'" aria-label="Remove window type">'+I.trash+'</button></div>'+
             '<div class="counters">'+keys.map(function(k){ return counterHTML('wt:'+wt.id+':'+k[0], k[1], wt[k[0]]||0); }).join('')+'</div>'+
@@ -792,12 +888,30 @@ function inputsHTML(s){
           '<div class="amt" data-amt="skylights">'+fmt((d.skylights||0)*n(r.skylight))+'</div></div></div>';
       break;
     }
-    case 'soft':
-      h += '<div class="field"><label>Approximate house exterior</label>'+qtyField('sqft',d.sqft,'sq ft','2400')+'</div>';
+    case 'soft': case 'roof': {
+      if(s.type === 'roof'){
+        h += '<div class="field"><label>Roof material</label><div class="seg" data-seg="material">'+
+          ROOF_MATERIALS.map(function(m){
+            return '<button type="button" data-val="'+m[0]+'" aria-pressed="'+(d.material===m[0])+'">'+m[0]+'</button>';
+          }).join('')+'</div></div>';
+        h += '<div class="field"><label>Approximate roof area</label>'+qtyField('sqft',d.sqft,'sq ft','2400')+'</div>';
+      } else {
+        h += '<div class="field"><label>Approximate house exterior</label>'+qtyField('sqft',d.sqft,'sq ft','2400')+'</div>';
+      }
+      h += '<div class="field"><label>Garage</label><div class="seg" data-seg="garage">'+
+        GARAGE_OPTS.map(function(g){
+          return '<button type="button" data-val="'+g[0]+'" aria-pressed="'+(d.garage===g[0])+'">'+g[0]+'</button>';
+        }).join('')+'</div></div>';
+      h += '<div class="field"><label>Accessory building</label>'+
+        '<select data-field="acc">'+ACC_OPTS.map(function(a){
+          return '<option'+(d.acc===a[0]?' selected':'')+'>'+a[0]+'</option>';
+        }).join('')+'</select></div>';
+      if(d.acc && d.acc !== 'None'){
+        h += '<div class="svc-label">How many</div><div class="counters">'+
+          counterHTML('accQty', d.acc, d.accQty||0)+'</div>';
+      }
       break;
-    case 'roof':
-      h += '<div class="field"><label>Approximate roof area</label>'+qtyField('sqft',d.sqft,'sq ft','2400')+'</div>';
-      break;
+    }
     case 'power': {
       h += '<div class="svc-label">Surfaces</div>';
       h += d.lines.map(function(l){
@@ -805,7 +919,7 @@ function inputsHTML(s){
           '<select data-line="'+l.id+'" data-lfield="surface">'+
             POWER_SURFACES.map(function(sf){ return '<option'+(sf===l.surface?' selected':'')+'>'+sf+'</option>'; }).join('')+
           '</select>'+
-          '<div class="unit-wrap post"><span class="adorn">sq ft</span>'+
+          '<div class="unit-wrap post"><span class="adorn">'+powerUnit(l.surface)+'</span>'+
             '<input type="number" inputmode="numeric" min="0" step="1" data-line="'+l.id+'" data-lfield="sqft" value="'+(l.sqft||'')+'" placeholder="0"></div>'+
           '<button class="mini-remove" data-linedel="'+l.id+'" aria-label="Remove surface">'+I.trash+'</button>'+
         '</div>';
@@ -814,15 +928,18 @@ function inputsHTML(s){
       break;
     }
     case 'gutter':
-      h += '<div class="svc-label">Linear feet by story</div><div class="gutter-grid">'+
+      h += '<div class="svc-label">Service</div>'+
+        toggleHTML('interior','Interior debris cleanout', d.interior)+
+        toggleHTML('wash','Exterior gutter wash', d.wash)+
+        '<div class="svc-label" style="margin-top:4px;">Linear feet by story</div><div class="gutter-grid">'+
         '<div class="field"><label>1st story</label>'+qtyField('ft1',d.ft1,'lin ft','120')+'</div>'+
         '<div class="field"><label>2nd story</label>'+qtyField('ft2',d.ft2,'lin ft','0')+'</div>'+
         '<div class="field"><label>3rd story</label>'+qtyField('ft3',d.ft3,'lin ft','0')+'</div></div>';
       break;
     case 'deck':
       h += '<div class="field"><label>Deck square footage</label>'+qtyField('sqft',d.sqft,'sq ft','320')+'</div>'+
-        toggleHTML('railings','Railings', d.railings)+
-        toggleHTML('stairs','Stairs', d.stairs);
+        '<div class="field"><label>Railings</label>'+qtyField('railFt',d.railFt,'lin ft','0')+'</div>'+
+        '<div class="field"><label>Stairs</label>'+qtyField('stairs',d.stairs,'steps','0')+'</div>';
       break;
     case 'dryer':
       h += '<div class="svc-label">Vent count</div><div class="counters">'+
@@ -834,6 +951,11 @@ function inputsHTML(s){
       h += '<div class="svc-label">Counts</div><div class="counters">'+
         counterHTML('registers','Registers', d.registers||0)+
         counterHTML('furnaces','Furnaces', d.furnaces||0)+
+        '</div>';
+      break;
+    case 'chimney':
+      h += '<div class="svc-label">Flues</div><div class="counters">'+
+        counterHTML('flues','Flues', d.flues||0)+
         '</div>';
       break;
   }
@@ -849,8 +971,10 @@ function ratesHTML(s){
       h += '<div class="svc-label">Standard pane, per pane</div>'+
         row('1st story', money('r1',r.r1))+row('2nd story', money('r2',r.r2))+row('3rd story', money('r3',r.r3))+
         row('XL multiplier','<div class="unit-wrap pre"><span class="adorn">\u00d7</span><input type="number" step="0.1" inputmode="decimal" data-rate="xl" value="'+r.xl+'"></div>')+
-        '<div class="svc-label" style="margin-top:16px;">Grid / mullion pane, per pane</div>'+
+        '<div class="svc-label" style="margin-top:16px;">Grid / mullion, per lite</div>'+
         row('1st story', money('g1',r.g1,0.25))+row('2nd story', money('g2',r.g2,0.25))+row('3rd story', money('g3',r.g3,0.25))+
+        '<div class="svc-label" style="margin-top:16px;">Style add-ons, per pane</div>'+
+        row('Double hung', money('dh',r.dh))+row('Casement', money('csmt',r.csmt))+
         '<div class="svc-label" style="margin-top:16px;">Feature add-ons, per pane</div>'+
         row('Snap-in muntins', money('snap',r.snap))+
         row('Storm window', money('storm',r.storm))+row('Pella storm', money('pella',r.pella))+
@@ -859,23 +983,48 @@ function ratesHTML(s){
         row('Screen, each', money('screen',r.screen))+row('Mirror, each', money('mirror',r.mirror))+
         row('Skylight, each', money('skylight',r.skylight));
       break;
-    case 'soft': case 'roof':
-      h += row('Rate per sq ft', money('perSqft',r.perSqft,0.01))+row('Minimum charge', money('min',r.min,5));
+    case 'soft':
+      h += '<div class="svc-label">House</div>'+row('Per sq ft', money('perSqft',r.perSqft,0.01))+
+        '<div class="svc-label" style="margin-top:16px;">Garage</div>'+
+        row('Attached', money('garAttached',r.garAttached,5))+row('Detached', money('garDetached',r.garDetached,5))+
+        '<div class="svc-label" style="margin-top:16px;">Accessory buildings, each</div>'+
+        row('Shed', money('accShed',r.accShed,5))+row('Pole barn', money('accPoleBarn',r.accPoleBarn,5))+
+        row('Other', money('accOther',r.accOther,5))+
+        row('Minimum charge', money('min',r.min,5));
+      break;
+    case 'roof':
+      h += '<div class="svc-label">Roof, per sq ft by material</div>'+
+        row('Asphalt', money('matAsphalt',r.matAsphalt,0.05))+row('Cedar', money('matCedar',r.matCedar,0.05))+
+        row('Steel', money('matSteel',r.matSteel,0.05))+
+        '<div class="svc-label" style="margin-top:16px;">Garage</div>'+
+        row('Attached', money('garAttached',r.garAttached,5))+row('Detached', money('garDetached',r.garDetached,5))+
+        '<div class="svc-label" style="margin-top:16px;">Accessory buildings, each</div>'+
+        row('Shed', money('accShed',r.accShed,5))+row('Pole barn', money('accPoleBarn',r.accPoleBarn,5))+
+        row('Other', money('accOther',r.accOther,5))+
+        row('Minimum charge', money('min',r.min,5));
       break;
     case 'power':
-      h += '<div class="svc-label">Rate per sq ft by surface</div>'+
-        POWER_SURFACES.map(function(sf){ return row(sf, money(sf,r[sf],0.01)); }).join('')+
+      h += '<div class="svc-label">Rate by surface</div>'+
+        POWER_SURFACES.map(function(sf){ return row(sf+' <span style="color:var(--text-tertiary)">/ '+powerUnit(sf)+'</span>', money(sf,r[sf],0.01)); }).join('')+
         row('Minimum charge', money('min',r.min,5));
       break;
     case 'gutter':
-      h += '<div class="svc-label">Rate per linear foot</div>'+
+      h += '<div class="svc-label">Base rate per linear foot</div>'+
         row('1st story', money('r1',r.r1,0.25))+row('2nd story', money('r2',r.r2,0.25))+
-        row('3rd story', money('r3',r.r3,0.25))+row('Minimum charge', money('min',r.min,5));
+        row('3rd story', money('r3',r.r3,0.25))+
+        '<div class="svc-label" style="margin-top:16px;">Service multipliers</div>'+
+        row('Interior debris cleanout','<div class="unit-wrap pre"><span class="adorn">\u00d7</span><input type="number" step="0.05" inputmode="decimal" data-rate="intMult" value="'+r.intMult+'"></div>')+
+        row('Exterior gutter wash','<div class="unit-wrap pre"><span class="adorn">\u00d7</span><input type="number" step="0.05" inputmode="decimal" data-rate="washMult" value="'+r.washMult+'"></div>')+
+        row('Minimum charge', money('min',r.min,5));
       break;
     case 'deck':
-      h += row('Rate per sq ft', money('perSqft',r.perSqft,0.25))+
-        row('Railings uplift', pct('railPct',r.railPct))+
-        row('Stairs uplift', pct('stairPct',r.stairPct))+
+      h += row('Deck, per sq ft', money('perSqft',r.perSqft,0.25))+
+        row('Railings, per lin ft', money('railPerFt',r.railPerFt,5))+
+        row('Stairs, per step', money('perStair',r.perStair,5))+
+        row('Minimum charge', money('min',r.min,5));
+      break;
+    case 'chimney':
+      h += row('Per flue', money('perFlue',r.perFlue,5))+
         row('Minimum charge', money('min',r.min,5));
       break;
     case 'dryer':
@@ -1108,15 +1257,45 @@ document.getElementById('menuBody').addEventListener('click', function(e){
 
 /* ============ window type dialog ============ */
 var winScrim = document.getElementById('winScrim');
-var winTargetId = null, m_size='Standard', m_feats=[], m_screens=false;
+var winTargetId = null, m_size='Standard', m_feats=[], m_screens=false, m_style='', m_grids=6;
 
 document.getElementById('segSize').innerHTML = Object.keys(WIN_SIZES).map(function(k,i){
   return '<button type="button" data-val="'+k+'" aria-pressed="'+(i===0)+'">'+WIN_SIZES[k].label+'</button>';
 }).join('');
 
+document.getElementById('segStyle').innerHTML = WIN_STYLES.map(function(st,i){
+  return '<button type="button" data-val="'+st.k+'" aria-pressed="'+(i===0)+'">'+st.label+'</button>';
+}).join('');
+
+document.getElementById('gridPresets').innerHTML = GRID_PRESETS.map(function(g){
+  return '<button type="button" data-val="'+g+'" aria-pressed="'+(g===6)+'">'+I.check+g+' lites</button>';
+}).join('');
+
 document.getElementById('chipTypes').innerHTML = WIN_FEATURES.map(function(f){
   return '<button type="button" data-val="'+f.k+'" aria-pressed="false">'+I.check+f.label+'</button>';
 }).join('');
+
+/* grid presets behave like a single-choice set, and sync with the custom box */
+document.getElementById('gridPresets').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return;
+  Array.prototype.forEach.call(b.parentElement.children, function(x){ x.setAttribute('aria-pressed','false'); });
+  b.setAttribute('aria-pressed','true');
+  m_grids = parseInt(b.dataset.val);
+  document.getElementById('gridsCustom').value = m_grids;
+});
+document.getElementById('gridsCustom').addEventListener('input', function(){
+  var v = parseInt(this.value.replace(/[^0-9]/g,''));
+  m_grids = (isNaN(v) || v < 1) ? 1 : Math.min(99, v);
+  document.querySelectorAll('#gridPresets button').forEach(function(b){
+    b.setAttribute('aria-pressed', parseInt(b.dataset.val) === m_grids ? 'true' : 'false');
+  });
+});
+
+/* size choice decides which extra fields are relevant */
+function syncSizeFields(){
+  document.getElementById('fieldGrids').style.display = (m_size === 'Grid') ? '' : 'none';
+  document.getElementById('fieldStyle').style.display = (m_size === 'Grid') ? 'none' : '';
+}
 
 function segWire(id, cb){
   document.getElementById(id).addEventListener('click', function(e){
@@ -1125,7 +1304,8 @@ function segWire(id, cb){
     b.setAttribute('aria-pressed','true'); cb(b.dataset.val);
   });
 }
-segWire('segSize', function(v){ m_size = v; });
+segWire('segSize', function(v){ m_size = v; syncSizeFields(); });
+segWire('segStyle', function(v){ m_style = v; });
 segWire('segScreens', function(v){ m_screens = (v === 'yes'); });
 document.getElementById('chipTypes').addEventListener('click', function(e){
   var b = e.target.closest('button'); if(!b) return;
@@ -1135,10 +1315,14 @@ document.getElementById('chipTypes').addEventListener('click', function(e){
 });
 
 function openWinDialog(svcId){
-  winTargetId = svcId; m_size='Standard'; m_feats=[]; m_screens=false;
+  winTargetId = svcId; m_size='Standard'; m_feats=[]; m_screens=false; m_style=''; m_grids=6;
   document.querySelectorAll('#segSize button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.val==='Standard'?'true':'false'); });
+  document.querySelectorAll('#segStyle button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.val===''?'true':'false'); });
   document.querySelectorAll('#segScreens button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.val==='no'?'true':'false'); });
   document.querySelectorAll('#chipTypes button').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+  document.querySelectorAll('#gridPresets button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.val==='6'?'true':'false'); });
+  document.getElementById('gridsCustom').value = 6;
+  syncSizeFields();
   winScrim.classList.add('open');
 }
 function closeWin(){ winScrim.classList.remove('open'); }
@@ -1156,6 +1340,8 @@ document.getElementById('winConfirm').addEventListener('click', function(){
   var s = services.find(function(x){ return x.id === winTargetId; });
   if(s){
     s.data.types.push({ id: s.data.nextTypeId++, size:m_size, features:m_feats.slice(),
+      style: (m_size === 'Grid') ? '' : m_style,
+      gridsPer: (m_size === 'Grid') ? Math.max(1, m_grids) : 1,
       screensEnabled:m_screens, f1:0, f2:0, f3:0, screens:0 });
   }
   closeWin(); render();
@@ -1178,27 +1364,43 @@ function masterRatesHTML(type, r){
     case 'window':
       h += row('Standard, 1st story','r1')+row('Standard, 2nd story','r2')+row('Standard, 3rd story','r3')+
            row('XL multiplier','xl','x')+
-           row('Grid, 1st story','g1','$',0.25)+row('Grid, 2nd story','g2','$',0.25)+row('Grid, 3rd story','g3','$',0.25)+
+           row('Grid, 1st story (per lite)','g1','$',0.25)+row('Grid, 2nd story (per lite)','g2','$',0.25)+
+           row('Grid, 3rd story (per lite)','g3','$',0.25)+
+           row('Double hung add','dh')+row('Casement add','csmt')+
            row('Snap-in muntins','snap')+
            row('Storm window','storm')+row('Pella storm','pella')+
            row('Interior, % of exterior','interiorPct','pct')+
            row('Screen, each','screen')+row('Mirror, each','mirror')+row('Skylight, each','skylight');
       break;
-    case 'soft': case 'roof':
-      h += row('Per sq ft','perSqft','$',0.01)+row('Minimum charge','min','$',5); break;
+    case 'soft':
+      h += row('House, per sq ft','perSqft','$',0.01)+
+           row('Garage, attached','garAttached','$',5)+row('Garage, detached','garDetached','$',5)+
+           row('Shed, each','accShed','$',5)+row('Pole barn, each','accPoleBarn','$',5)+
+           row('Other building, each','accOther','$',5)+row('Minimum charge','min','$',5); break;
+    case 'roof':
+      h += row('Asphalt, per sq ft','matAsphalt','$',0.05)+row('Cedar, per sq ft','matCedar','$',0.05)+
+           row('Steel, per sq ft','matSteel','$',0.05)+
+           row('Garage, attached','garAttached','$',5)+row('Garage, detached','garDetached','$',5)+
+           row('Shed, each','accShed','$',5)+row('Pole barn, each','accPoleBarn','$',5)+
+           row('Other building, each','accOther','$',5)+row('Minimum charge','min','$',5); break;
     case 'power':
-      h += POWER_SURFACES.map(function(sf){ return row(sf,sf,'$',0.01); }).join('')+row('Minimum charge','min','$',5); break;
+      h += POWER_SURFACES.map(function(sf){ return row(sf+' / '+powerUnit(sf), sf,'$',0.01); }).join('')+
+           row('Minimum charge','min','$',5); break;
     case 'gutter':
       h += row('1st story, per lin ft','r1','$',0.25)+row('2nd story, per lin ft','r2','$',0.25)+
-           row('3rd story, per lin ft','r3','$',0.25)+row('Minimum charge','min','$',5); break;
+           row('3rd story, per lin ft','r3','$',0.25)+
+           row('Interior debris cleanout','intMult','x')+row('Exterior gutter wash','washMult','x')+
+           row('Minimum charge','min','$',5); break;
     case 'deck':
-      h += row('Per sq ft','perSqft','$',0.25)+row('Railings uplift','railPct','pct')+
-           row('Stairs uplift','stairPct','pct')+row('Minimum charge','min','$',5); break;
+      h += row('Deck, per sq ft','perSqft','$',0.25)+row('Railings, per lin ft','railPerFt','$',5)+
+           row('Stairs, per step','perStair','$',5)+row('Minimum charge','min','$',5); break;
     case 'dryer':
       h += row('Per vent','perVent','$',5)+row('Ladder access add','ladderAdd','$',5); break;
     case 'duct':
       h += row('Per register','perRegister','$',5)+row('Per furnace system','perSystem','$',5)+
            row('Minimum charge','min','$',5); break;
+    case 'chimney':
+      h += row('Per flue','perFlue','$',5)+row('Minimum charge','min','$',5); break;
   }
   return h;
 }
