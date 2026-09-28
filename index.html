@@ -9,13 +9,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-default:#ffffff; --bg-secondary:#f5f5f5; --bg-tertiary:#e3e3e3; --bg-disabled:#d9d9d9;
-    --bg-brand:#2c2c2c; --bg-brand-hover:#1e1e1e; --text-on-brand:#f5f5f5;
-    --border-default:#d9d9d9; --border-strong:#767676; --border-brand:#2c2c2c;
-    --text-default:#1e1e1e; --text-secondary:#303030; --text-tertiary:#757575; --text-disabled:#b3b3b3;
+    /* repointed to the TGG report design system (ink/blue, flat, border-only) */
+    --bg-default:#ffffff; --bg-secondary:#EAEDF0; --bg-tertiary:#EDF4FC; --bg-disabled:#e3e7eb;
+    --bg-brand:#101113; --bg-brand-hover:#000000; --text-on-brand:#ffffff;
+    --border-default:#E3E7EB; --border-strong:#B7BEC6; --border-brand:#101113;
+    --text-default:#101113; --text-secondary:#2b2e33; --text-tertiary:#6B7280; --text-disabled:#9CA3AF;
     --text-danger:#900b09; --bg-danger:#fdd3d0;
-    --accent:#3FA9F5; --accent-ink:#0d6cab; --accent-wash:#eaf5fe;
-    --radius:8px; --radius-pill:999px;
+    --accent:#2F8FE0; --accent-ink:#1E6FBA; --accent-wash:#EDF4FC;
+    /* flat, editorial radius: sharp corners everywhere except genuinely round controls */
+    --radius-sm:0px; --radius:0px; --radius-lg:0px; --radius-pill:999px;
+    /* hover tints, one step below each color's Default state */
+    --bg-default-hover:#f2f4f6; --bg-neutral-hover:#dfe3e7; --bg-danger-hover:#fac4c0; --accent-hover:#1E6FBA;
+    --shadow-sm:none; --shadow-md:0 8px 28px rgba(16,17,19,.18);
     --sp-100:4px; --sp-200:8px; --sp-300:12px; --sp-400:16px; --sp-600:24px;
     --size-control:40px; --size-icon-btn:44px;
   }
@@ -26,7 +31,8 @@
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     font-size:16px; line-height:1.4; -webkit-tap-highlight-color:transparent;
   }
-  .wrap{max-width:760px;margin:0 auto;padding-bottom:104px;}
+  .wrap{max-width:760px;margin:0 auto;padding-bottom:160px;background:var(--bg-default);}
+  @media(min-width:640px){ .wrap{margin:32px auto;border:1px solid var(--border-default);} }
   svg{display:block;flex-shrink:0;}
 
   /* header */
@@ -39,7 +45,7 @@
   .brand .logo{width:52px;color:var(--text-default);}
   .brand .logo svg{width:100%;height:auto;}
   .brand .divider{width:1px;height:28px;background:var(--border-default);}
-  .brand .word{font-size:19px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;}
+  .brand .word{font-size:19px;font-weight:800;letter-spacing:-.015em;white-space:nowrap;}
 
   /* buttons */
   .btn{
@@ -62,20 +68,32 @@
     border:1px solid transparent;display:flex;align-items:center;justify-content:center;
     cursor:pointer;background:transparent;color:var(--text-default);
   }
+  .icon-btn:active{background:var(--bg-neutral-hover);}
   .icon-btn-primary{background:var(--bg-brand);border-color:var(--border-brand);color:var(--text-on-brand);}
   .icon-btn-primary:active{background:var(--bg-brand-hover);}
   @media(max-width:420px){ .btn .btn-label{display:none;} .btn{padding:0 var(--sp-300);} }
+  /* hover states (pointer devices only, so touch never gets a stuck hover) */
+  @media(hover:hover) and (pointer:fine){
+    .btn-primary:hover{background:var(--bg-brand-hover);}
+    .btn-neutral:hover{background:var(--bg-disabled);}
+    .btn-subtle:hover{background:var(--bg-secondary);}
+    .btn-danger:hover{background:var(--bg-danger);}
+    .btn-ghost:hover{background:var(--bg-default-hover);color:var(--text-default);}
+    .btn-accent:hover{background:var(--accent-wash);}
+    .icon-btn:hover{background:var(--bg-neutral-hover);}
+    .icon-btn-primary:hover{background:var(--bg-brand-hover);}
+  }
 
   /* cards */
   .card{
-    background:var(--bg-default);border:1px solid var(--border-default);border-radius:var(--radius);
-    margin:var(--sp-400) var(--sp-400) 0;padding:var(--sp-400);
+    background:var(--bg-default);border:0;border-bottom:1px solid var(--border-default);border-radius:0;
+    margin:0;padding:var(--sp-600) var(--sp-400);
   }
   .card-title{
     display:flex;align-items:center;gap:var(--sp-200);margin-bottom:var(--sp-400);
-    font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);
+    font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-ink);
   }
-  .card-title svg{color:var(--text-tertiary);}
+  .card-title svg{color:var(--accent-ink);}
 
   /* fields */
   .field{margin-bottom:var(--sp-400);}
@@ -119,9 +137,9 @@
   .chips button[aria-pressed="true"] .check{display:block;}
 
   /* service accordion */
-  .svc{background:var(--bg-default);border:1px solid var(--border-default);border-radius:var(--radius);
-    margin:var(--sp-300) var(--sp-400) 0;overflow:hidden;}
-  .svc-head{display:flex;align-items:center;gap:var(--sp-300);padding:var(--sp-300) var(--sp-400);cursor:pointer;
+  .svc{background:var(--bg-default);border:0;border-bottom:1px solid var(--border-default);border-radius:0;
+    margin:0;overflow:hidden;}
+  .svc-head{display:flex;align-items:center;gap:var(--sp-300);padding:var(--sp-400);cursor:pointer;
     background:none;border:none;width:100%;font-family:inherit;text-align:left;}
   .svc-head .ico{width:36px;height:36px;border-radius:var(--radius);background:var(--bg-secondary);
     display:flex;align-items:center;justify-content:center;color:var(--text-secondary);}
@@ -226,24 +244,25 @@
   .hint{font-size:13px;color:var(--text-tertiary);margin:0 0 var(--sp-300);}
 
   /* empty */
-  .empty{border:1px dashed var(--border-default);border-radius:var(--radius);padding:var(--sp-600) var(--sp-400);
+  .empty{border:0;border-bottom:1px solid var(--border-default);border-radius:0;padding:var(--sp-600) var(--sp-400);
     text-align:center;color:var(--text-tertiary);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:var(--sp-200);
-    margin:var(--sp-300) var(--sp-400) 0;background:var(--bg-default);}
+    margin:0;background:var(--bg-default);}
 
   /* grand total bar */
   .totalbar{position:fixed;left:0;right:0;bottom:0;background:var(--bg-brand);color:var(--text-on-brand);z-index:30;
     padding-bottom:env(safe-area-inset-bottom);}
   .totalbar-inner{max-width:760px;margin:0 auto;padding:var(--sp-300) var(--sp-400);
     display:flex;align-items:center;justify-content:space-between;gap:var(--sp-300);}
-  .totalbar .k{font-size:13px;font-weight:500;color:#b3b3b3;}
-  .totalbar .k small{display:block;font-size:11px;}
-  .totalbar .v{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--accent);}
+  .totalbar .k{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#9DA5AE;}
+  .totalbar .k small{display:block;font-size:11px;text-transform:none;letter-spacing:normal;}
+  .totalbar .v{font-size:26px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--accent);}
 
   /* dialog */
   .scrim{display:none;position:fixed;inset:0;background:rgba(30,30,30,.5);z-index:60;align-items:flex-end;justify-content:center;}
   .scrim.open{display:flex;}
-  .dialog{background:var(--bg-default);width:100%;max-width:520px;border-radius:var(--radius) var(--radius) 0 0;max-height:90vh;overflow-y:auto;}
-  @media(min-width:560px){ .scrim{align-items:center;} .dialog{border-radius:var(--radius);} }
+  .dialog{background:var(--bg-default);width:100%;max-width:520px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow:var(--shadow-md);max-height:90vh;overflow-y:auto;}
+  @media(min-width:560px){ .scrim{align-items:center;} .dialog{border-radius:var(--radius-lg);} }
   .dialog-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-300);
     padding:var(--sp-400);border-bottom:1px solid var(--border-default);position:sticky;top:0;background:var(--bg-default);}
   .dialog-head h3{margin:0;font-size:18px;font-weight:600;}
@@ -261,10 +280,14 @@
   .menu-item .mi-text{flex:1;min-width:0;}
   .menu-item .mi-text small{display:block;font-size:12px;font-weight:400;color:var(--text-tertiary);}
   .menu-item[disabled]{opacity:.45;cursor:default;}
+  @media(hover:hover) and (pointer:fine){
+    .menu-item:not([disabled]):hover{background:var(--bg-default-hover);border-color:var(--border-strong);}
+    .saved-item:not(.current):hover{border-color:var(--border-strong);}
+  }
 
   /* saved estimates */
   .status-line{display:flex;align-items:center;justify-content:center;gap:6px;
-    margin:var(--sp-300) var(--sp-400) 0;font-size:12px;color:var(--text-tertiary);min-height:16px;}
+    margin:0;padding:var(--sp-300) var(--sp-400);font-size:12px;color:var(--text-tertiary);min-height:16px;}
   .status-line svg{color:var(--text-tertiary);}
   .status-line.warn{color:var(--text-danger);}
   .status-line.warn svg{color:var(--text-danger);}
@@ -279,8 +302,9 @@
   .saved-empty{text-align:center;color:var(--text-tertiary);font-size:14px;padding:var(--sp-600) 0;}
 
   /* footer actions */
-  .footer-bar{display:flex;gap:var(--sp-300);margin:var(--sp-600) var(--sp-400) 0;}
-  .footer-bar .btn{flex:1;}
+  .footer-bar{display:flex;gap:0;margin:0;border-top:1px solid var(--border-default);}
+  .footer-bar .btn{flex:1;border-radius:0;min-height:50px;}
+  .footer-bar .btn:first-child{border-right:1px solid var(--border-default);}
   .btn-ghost{background:transparent;border-color:var(--border-default);color:var(--text-tertiary);font-size:14px;font-weight:500;}
   .btn-ghost:active{background:var(--bg-default);color:var(--text-default);}
   .btn-ghost svg{color:var(--text-tertiary);}
@@ -303,8 +327,7 @@
     .wrap{max-width:820px;}
     .totalbar-inner{max-width:820px;}
     header{padding:var(--sp-400) var(--sp-600);}
-    .card,.svc,.empty{margin-left:var(--sp-600);margin-right:var(--sp-600);}
-    .footer-bar{margin-left:var(--sp-600);margin-right:var(--sp-600);}
+    .card,.svc-head,.svc-body,.empty{padding-left:var(--sp-600);padding-right:var(--sp-600);}
     .brand .word{font-size:21px;}
     .brand .logo{width:60px;}
     .gutter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-300);}
@@ -325,11 +348,9 @@
   /* footer buttons need their own line well before 400px now that there are three */
   @media(max-width:640px){
     .footer-bar{flex-direction:column;}
+    .footer-bar .btn:first-child{border-right:none;border-bottom:1px solid var(--border-default);}
   }
   @media(max-width:400px){
-    .card,.svc,.empty{margin-left:var(--sp-300);margin-right:var(--sp-300);}
-    .footer-bar{margin-left:var(--sp-300);margin-right:var(--sp-300);}
-    .status-line{margin-left:var(--sp-300);margin-right:var(--sp-300);}
     .card{padding:var(--sp-300);}
     .svc-head{padding:var(--sp-300);}
     .svc-body{padding:0 var(--sp-300) var(--sp-300);}
@@ -411,6 +432,105 @@
   }
   .signout-btn:hover{color:var(--text-default);}
   .who-line{display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-200);padding:6px var(--sp-400) 0;max-width:760px;margin:0 auto;}
+
+  /* ===== report-style layer: masthead, hero, stats, eyebrows, blue accents ===== */
+  :root{ --pad:20px; }
+  @media(min-width:768px){ :root{ --pad:36px; } }
+  header{position:relative;top:auto;padding:22px var(--pad);align-items:center;}
+  @media(min-width:768px){ header{padding:26px var(--pad);} }
+  .mast{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0;}
+  .mast .logo-full{display:block;height:24px;width:73px;color:var(--text-default);}
+  @media(min-width:768px){ .mast .logo-full{height:28px;width:85px;} }
+  .mast-tag{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-tertiary);}
+  #topMenuBtn{border:1px solid var(--border-default);border-radius:0;width:44px;height:44px;}
+
+  .eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  .hero{padding:34px var(--pad) 30px;border-bottom:1px solid var(--border-default);}
+  .hero .eyebrow{margin-bottom:14px;}
+  .hero h1{margin:0;font-size:clamp(30px,7.4vw,42px);line-height:1.12;font-weight:800;letter-spacing:-.02em;text-wrap:balance;overflow-wrap:anywhere;}
+  .hero h1 em{font-style:normal;color:var(--accent);}
+  .hero-sub{margin:14px 0 0;font-size:15px;line-height:1.6;color:var(--text-tertiary);max-width:560px;}
+  .stats{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border-default);}
+  .stat{padding:22px var(--pad) 24px;min-width:0;}
+  .stat + .stat{border-left:1px solid var(--border-default);}
+  .stat .rule{width:28px;height:3px;background:var(--accent);margin-bottom:14px;}
+  .stat .num{font-size:clamp(24px,6.4vw,32px);font-weight:800;letter-spacing:-.015em;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .stat .label{margin-top:6px;font-size:12px;color:var(--text-tertiary);}
+
+  .card{padding:32px var(--pad);}
+  .sec-h{margin:0 0 4px;font-size:21px;font-weight:700;letter-spacing:-.01em;line-height:1.25;}
+  .sec-desc{margin:0 0 22px;font-size:13px;line-height:1.5;color:var(--text-tertiary);}
+  .sec-head{padding:32px var(--pad) 24px;border-bottom:1px solid var(--border-default);}
+  .sec-head .sec-desc{margin-bottom:18px;}
+  .btn-blue{width:100%;justify-content:center;min-height:48px;background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+  .btn-blue:active{background:var(--accent-ink);}
+
+  .grid2{row-gap:18px;}
+  .grid2 .field{margin-bottom:0;}
+  .grid2 + .grid2{margin-top:18px;}
+  .field > label{font-size:12.5px;font-weight:600;color:var(--text-secondary);margin-bottom:7px;}
+  input[type=text],input[type=number],input[type=date],select{height:44px;}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);outline:none;}
+
+  .svc-head{padding:18px var(--pad);gap:14px;}
+  .svc-head .ico{width:40px;height:40px;background:var(--accent-wash);color:var(--accent-ink);flex-shrink:0;}
+  .svc-head .name{font-size:16px;font-weight:700;letter-spacing:-.005em;line-height:1.3;}
+  .svc-head .name small{display:block;margin-top:2px;font-size:11.5px;font-weight:500;color:var(--accent-ink);letter-spacing:0;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .svc-head .sum{font-size:17px;font-weight:800;letter-spacing:-.01em;}
+  .svc-head[aria-expanded="true"]{background:var(--bg-default);}
+  .svc-body{padding:0 var(--pad) 24px;}
+  .svc-section{padding-top:22px;}
+  .svc-label{font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--accent-ink);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+  .svc-sub{border-top:2px solid var(--text-default);padding-top:14px;}
+  .svc-sub .k{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-default);}
+  .svc-sub .v{font-size:26px;font-weight:800;letter-spacing:-.015em;}
+  .bd-row .v{font-weight:600;}
+  .disclosure .dl,.disclosure .chev{color:var(--accent-ink);}
+  .disclosure .dl{letter-spacing:.12em;font-size:11px;}
+
+  .counter button{background:var(--accent-wash);color:var(--accent-ink);}
+  .counter button:active{background:#d7e7f8;}
+  .row .ctrl button{color:var(--accent-ink);}
+  .row .label svg,.wt-name svg{color:var(--accent-ink);}
+  .wt-name{font-weight:700;}
+  .seg button[aria-pressed="true"],.chips button[aria-pressed="true"]{background:var(--accent-ink);border-color:var(--accent-ink);color:#fff;}
+  .btn-neutral{background:var(--bg-default);border:1px solid var(--accent);color:var(--accent-ink);font-weight:600;}
+  .btn-neutral:active{background:var(--accent-wash);}
+  .empty svg{color:var(--accent);}
+  .empty{padding:36px var(--pad);}
+
+  .footer-bar .btn{font-size:15px;font-weight:600;min-height:54px;}
+  .btn-ghost{color:var(--text-default);border-color:transparent;}
+  .btn-ghost svg{color:var(--text-default);}
+  .btn-accent{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn-accent:active{background:var(--accent-ink);}
+  .footer-bar .btn-accent{border-left:0;}
+
+  .dialog-head h3{font-size:20px;font-weight:800;letter-spacing:-.01em;}
+  .menu-item{font-weight:600;padding:14px;}
+  .menu-item .ico{background:var(--accent-wash);color:var(--accent-ink);width:40px;height:40px;}
+  .menu-item .mi-text small{margin-top:2px;}
+  #menuBody .menu-item > span:last-child{color:var(--accent-ink) !important;}
+  .who-line{max-width:none;margin:14px 0 0;padding:14px 0 0;border-top:1px solid var(--border-default);justify-content:space-between;}
+  .who-k{display:flex;flex-direction:column;gap:3px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-tertiary);min-width:0;}
+  .who-k #whoEmail{letter-spacing:0;text-transform:none;font-weight:500;color:var(--text-default) !important;overflow:hidden;text-overflow:ellipsis;}
+  .signout-btn{border:1px solid var(--border-default);padding:8px 12px;color:var(--text-default);font-weight:600;}
+
+  .totalbar .v{font-size:28px;}
+  @media(hover:hover) and (pointer:fine){
+    .btn-blue:hover,.btn-accent:hover{background:var(--accent-ink);border-color:var(--accent-ink);}
+    .btn-neutral:hover{background:var(--accent-wash);}
+    .btn-ghost:hover{background:var(--bg-default-hover);}
+    .svc-head:hover{background:#fafbfc;}
+    .counter button:hover{background:#dcebf9;}
+    .signout-btn:hover{border-color:var(--border-strong);}
+  }
+  @media(max-width:400px){
+    .svc-head{padding:16px var(--pad);}
+    .svc-body{padding:0 var(--pad) 20px;}
+    .card{padding:28px var(--pad);}
+  }
 </style>
 </head>
 <body>
@@ -432,34 +552,33 @@
 </div>
 
 <div id="app-shell">
-<div class="who-line">
-  <span id="whoEmail" style="font-size:13px;color:var(--text-tertiary)"></span>
-  <button class="signout-btn" id="signOutBtn">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-    Sign out
-  </button>
-</div>
+
 <div class="wrap">
 
   <header>
-    <div class="brand">
-      <div class="logo" aria-label="Two Glass Gents">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 309.08 167.9" fill="currentColor" role="img"><title>Two Glass Gents</title><path d="M121.42,156.83c1.41,7.38-1.7,11.07-9.36,11.07-4.83,0-7.74-2.48-8.73-7.45l-13.41-69.59c-1.42-7.79-6.24-11.7-14.47-11.7h-28.94c-8.23,0-13.12,3.91-14.69,11.7l-13.4,69.59c-.85,4.97-3.76,7.45-8.72,7.45-7.66,0-10.79-3.69-9.37-11.07l13.41-69.37c1.41-7.79,5.21-14.22,11.38-19.26,6.17-5.03,13.3-7.55,21.39-7.55h28.94c7.95,0,15,2.52,21.18,7.55,6.17,5.04,10.03,11.46,11.59,19.26l13.19,69.37ZM81.52,8.51C75.78,2.84,68.92,0,60.99,0s-14.97,2.84-20.65,8.51c-5.68,5.68-8.52,12.56-8.52,20.64,0,6.81,2.2,12.98,6.6,18.51,1.7,2.27,4.04,3.41,7.02,3.41,5.82,0,8.73-2.9,8.73-8.72,0-2.13-.82-4.15-2.44-6.07-1.64-1.91-2.45-4.28-2.45-7.13,0-7.8,3.9-11.71,11.71-11.71s11.69,3.91,11.69,11.71c0,2.84-.82,5.21-2.45,7.13-1.63,1.91-2.44,3.94-2.44,6.07,0,5.82,2.9,8.72,8.72,8.72,2.84,0,5.17-1.14,7.01-3.41,4.41-5.53,6.6-11.71,6.6-18.51,0-8.09-2.87-14.97-8.61-20.64ZM295.55,87.46c-1.56-7.79-5.43-14.22-11.59-19.26-6.17-5.03-13.23-7.55-21.18-7.55h-28.94c-8.09,0-15.22,2.52-21.39,7.55-6.17,5.04-9.97,11.46-11.38,19.26l-13.41,69.37c-1.42,7.38,1.7,11.07,9.36,11.07,4.96,0,7.88-2.48,8.72-7.45l13.41-69.59c1.56-7.79,6.46-11.7,14.68-11.7h28.94c8.23,0,13.06,3.91,14.47,11.7l13.41,69.59c.99,4.97,3.9,7.45,8.73,7.45,7.66,0,10.78-3.69,9.36-11.07l-13.2-69.37ZM268.84,8.51c-5.75-5.67-12.59-8.51-20.53-8.51s-14.97,2.84-20.64,8.51c-5.67,5.68-8.52,12.56-8.52,20.64,0,6.81,2.21,12.98,6.6,18.51,1.7,2.27,4.05,3.41,7.03,3.41,5.82,0,8.73-2.9,8.73-8.72,0-2.13-.82-4.15-2.45-6.07-1.63-1.91-2.45-4.28-2.45-7.13,0-7.8,3.91-11.71,11.71-11.71s11.7,3.91,11.7,11.71c0,2.84-.82,5.21-2.45,7.13-1.62,1.91-2.44,3.94-2.44,6.07,0,5.82,2.9,8.72,8.73,8.72,2.84,0,5.18-1.14,7.02-3.41,4.4-5.53,6.61-11.71,6.61-18.51,0-8.09-2.88-14.97-8.63-20.64Z"/></svg>
-      </div>
-      <div class="divider"></div>
-      <div class="word">Estimates</div>
+    <div class="mast">
+      <svg class="logo-full" fill="currentColor" role="img" aria-label="Two Glass Gents" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 582.87 192.09"><g><g><path d="M351.23,107.45q1.45,7.59-6.41,7.58c-3.31,0-5.31-1.7-6-5.1l-9.19-47.68q-1.45-8-9.91-8H299.91q-8.46,0-10.06,8l-9.19,47.68q-.87,5.1-6,5.1-7.87,0-6.42-7.58l9.19-47.53a21.48,21.48,0,0,1,7.8-13.19,22.51,22.51,0,0,1,14.65-5.18h19.83a22.92,22.92,0,0,1,22.45,18.37ZM323.89,5.83a20,20,0,0,0-28.21,0A19.25,19.25,0,0,0,289.85,20a19.9,19.9,0,0,0,4.52,12.68A5.7,5.7,0,0,0,299.18,35q6,0,6-6a6.32,6.32,0,0,0-1.68-4.15A7.25,7.25,0,0,1,301.8,20q0-8,8-8t8,8a7.25,7.25,0,0,1-1.68,4.88A6.35,6.35,0,0,0,314.49,29q0,6,6,6a5.93,5.93,0,0,0,4.8-2.33A19.84,19.84,0,0,0,329.79,20,19.13,19.13,0,0,0,323.89,5.83ZM470.53,59.92a22.9,22.9,0,0,0-22.45-18.37H428.25a22.51,22.51,0,0,0-14.65,5.18,21.48,21.48,0,0,0-7.8,13.19l-9.19,47.53Q395.16,115,403,115q5.1,0,6-5.1l9.19-47.68q1.6-8,10.06-8h19.83q8.46,0,9.91,8l9.19,47.68q1,5.1,6,5.1,7.88,0,6.41-7.58ZM452.23,5.83a20,20,0,0,0-28.21,0A19.29,19.29,0,0,0,418.19,20a19.9,19.9,0,0,0,4.52,12.68A5.7,5.7,0,0,0,427.52,35q6,0,6-6a6.32,6.32,0,0,0-1.68-4.15A7.3,7.3,0,0,1,430.14,20q0-8,8-8t8,8a7.3,7.3,0,0,1-1.67,4.88A6.32,6.32,0,0,0,442.83,29q0,6,6,6a6,6,0,0,0,4.81-2.33A19.9,19.9,0,0,0,458.14,20,19.14,19.14,0,0,0,452.23,5.83Z"/><path d="M98.48,127.5c-4.35,0-5.8.81-7.16,5.07l-9.42,28.9c-.73,2.26-1.27,4.89-1.27,4.89h-.18s-.73-2.72-1.45-4.89L67.85,127.68H61.7L50.55,161.47c-.72,2.17-1.45,4.89-1.45,4.89h-.18s-.63-2.72-1.36-4.89l-9.33-28.9c-1.36-4.26-2.81-5.07-7.16-5.07H12.14V114.9H6.07v12.6H0v5.34H6v23.65c0,15.22,10.6,16.94,15.85,16.94a17.85,17.85,0,0,0,2.63-.18v-5.53a10.69,10.69,0,0,1-2.08.18c-3.45,0-10.24-1.35-10.24-12.05v-23H29.08c1.63,0,2.63.45,3.17,2.09l13,38.13h6.88l11-32.43c.82-2.26,1.45-4.89,1.45-4.89h.19s.63,2.63,1.35,4.89l11.15,32.43h6.79l13-38.13c.54-1.64,1.63-2.09,3.17-2.09h1.27V127.5Z"/><path d="M129.28,126.41c13.32,0,24.1,10.15,24.1,23.64a24.06,24.06,0,1,1-48.11,0C105.27,136.56,116.05,126.41,129.28,126.41Zm.09,42.22c9.69,0,17.66-8,17.66-18.58a17.71,17.71,0,1,0-35.42,0C111.61,160.65,119.59,168.63,129.37,168.63Z"/><path d="M180.55,126.41c12.23,0,15.13,7.79,15.13,7.79h.18v-1.72c0-3.26,1.45-5,5.17-5h6.34v5.34h-3.72a1.78,1.78,0,0,0-2,2V172c0,14.49-10.69,20.11-21.92,20.11a33.36,33.36,0,0,1-14.86-3.62l2.35-5.17a28,28,0,0,0,12.32,3.17c8.88,0,15.95-4.16,15.95-14.31v-4c0-1.72.09-3.26.09-3.26h-.18c-2.72,5-7.25,7.89-14.31,7.89-12.24,0-20.3-9.7-20.3-23.38S168.32,126.41,180.55,126.41Zm15,23c0-13.31-6.34-17.39-14.4-17.39-8.88,0-14.05,6.43-14.05,17.3S173,167.27,182,167.27C189.25,167.27,195.59,162.83,195.59,149.42Z"/><path d="M217.24,116.71a1.81,1.81,0,0,0-2-2h-3.8v-5.34h6.43c3.89,0,5.52,1.63,5.52,5.52v50.83a1.77,1.77,0,0,0,2,2h3.81v5.34h-6.43c-3.9,0-5.53-1.63-5.53-5.52Z"/><path d="M263.17,145h2.54v-.54c0-9.51-3.44-12.87-11.78-12.87-2.26,0-8.88.64-8.88,4v2.91h-5.89v-4.35c0-6.34,10.88-7.7,14.86-7.7,14.41,0,17.85,7.7,17.85,17.48v21.84a1.77,1.77,0,0,0,2,2h3.81v5.34h-6.25c-3.9,0-5.44-1.72-5.44-5.43,0-2,.09-3.35.09-3.35h-.18a16.12,16.12,0,0,1-15.13,9.87c-7.61,0-15.49-4.44-15.49-13.5C235.27,145.53,255.29,145,263.17,145ZM251.76,168.9c8.69,0,13.95-9.06,13.95-16.94v-2.09h-2.63c-7.16,0-21.47.18-21.47,10.42C241.61,164.55,245,168.9,251.76,168.9Z"/><path d="M285.73,161.92a18.54,18.54,0,0,0,14,6.89c5.07,0,9.6-2.45,9.6-7.25,0-10-25.54-8.15-25.54-22.83,0-8.24,7.07-12.32,16.21-12.32,4.62,0,13.86,1.81,13.86,8.24v3.9h-5.8v-2.18c0-3.35-4.89-4.61-7.88-4.61-6.34,0-10.14,2.17-10.14,6.61,0,10.23,25.55,7.88,25.55,23,0,7.61-6.89,12.77-15.95,12.77-11.87,0-17.48-8-17.48-8Z"/><path d="M325.59,161.92a18.54,18.54,0,0,0,14,6.89c5.07,0,9.6-2.45,9.6-7.25,0-10-25.54-8.15-25.54-22.83,0-8.24,7.06-12.32,16.21-12.32,4.62,0,13.86,1.81,13.86,8.24v3.9H348v-2.18c0-3.35-4.9-4.61-7.89-4.61-6.34,0-10.14,2.17-10.14,6.61,0,10.23,25.55,7.88,25.55,23,0,7.61-6.89,12.77-15.95,12.77-11.87,0-17.49-8-17.49-8Z"/><path d="M382.84,126.41c12.23,0,15.13,7.79,15.13,7.79h.18v-1.72c0-3.26,1.45-5,5.17-5h6.34v5.34h-3.72a1.78,1.78,0,0,0-2,2V172c0,14.49-10.69,20.11-21.92,20.11a33.36,33.36,0,0,1-14.86-3.62l2.35-5.17a28,28,0,0,0,12.33,3.17c8.87,0,15.94-4.16,15.94-14.31v-4c0-1.72.09-3.26.09-3.26h-.18c-2.72,5-7.25,7.89-14.31,7.89-12.24,0-20.3-9.7-20.3-23.38S370.61,126.41,382.84,126.41Zm15,23c0-13.31-6.34-17.39-14.4-17.39-8.88,0-14.05,6.43-14.05,17.3s5.9,17.94,14.86,17.94C391.54,167.27,397.88,162.83,397.88,149.42Z"/><path d="M437.83,126.41c12.59,0,19.12,9.7,19.12,21,0,1.09-.18,3.08-.18,3.08h-35c.18,11.5,8.24,18.12,17.66,18.12A20.29,20.29,0,0,0,453.14,163l3,4.62a25.85,25.85,0,0,1-16.94,6.52c-13.5,0-23.83-9.78-23.83-23.82C415.36,135.38,425.6,126.41,437.83,126.41Zm12.77,19.21c-.36-9.43-6.16-14.05-12.86-14.05-7.52,0-14.13,4.9-15.67,14.05Z"/><path d="M469.27,134.84a1.82,1.82,0,0,0-2-2h-3.8V127.5h6.34c3.81,0,5.53,1.63,5.53,5.07v2.08a27.75,27.75,0,0,1-.19,3.26h.19a19.34,19.34,0,0,1,18.12-11.5c11.32,0,15.3,6.43,15.3,17.67v21.65a1.78,1.78,0,0,0,2,2h3.81v5.34h-6.44c-3.89,0-5.53-1.63-5.53-5.52V145.7c0-7.15-1.08-13.49-9.87-13.49a17.31,17.31,0,0,0-16.58,12.86,22.72,22.72,0,0,0-.72,6.16v21.83h-6.16Z"/><path d="M524.89,132.66h-6V127.5H525V114.9h6.07v12.6h11.41v5.16H531.05v23.19c0,10.7,6.79,12.05,10.23,12.05a10.61,10.61,0,0,0,2.09-.18v5.53a17.85,17.85,0,0,1-2.63.18c-5.25,0-15.85-1.72-15.85-16.94Z"/><path d="M553,161.92a18.57,18.57,0,0,0,14,6.89c5.08,0,9.61-2.45,9.61-7.25,0-10-25.55-8.15-25.55-22.83,0-8.24,7.07-12.32,16.22-12.32,4.62,0,13.86,1.81,13.86,8.24v3.9h-5.8v-2.18c0-3.35-4.89-4.61-7.88-4.61-6.35,0-10.15,2.17-10.15,6.61,0,10.23,25.55,7.88,25.55,23,0,7.61-6.89,12.77-16,12.77-11.87,0-17.48-8-17.48-8Z"/></g></g></svg>
+      <div class="mast-tag">Field Estimates</div>
     </div>
-    <button class="btn btn-primary" id="addServiceBtn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      <span class="btn-label">Add service</span>
+    <button class="icon-btn" id="topMenuBtn" aria-label="Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
     </button>
   </header>
 
+  <section class="hero">
+    <div class="eyebrow" id="heroKicker">Draft estimate</div>
+    <h1 id="heroTitle">Start a new <em>estimate</em>.</h1>
+    <p class="hero-sub" id="heroSub">Add the client, then build the quote one service at a time.</p>
+  </section>
+  <div class="stats">
+    <div class="stat"><div class="rule"></div><div class="num" id="heroTotal">$0</div><div class="label">Estimate total</div></div>
+    <div class="stat"><div class="rule"></div><div class="num" id="heroCount">0</div><div class="label" id="heroCountLbl">Services quoted</div></div>
+  </div>
+
   <section class="card">
-    <div class="card-title">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Client
-    </div>
+    <div class="eyebrow">Client</div>
+    <h2 class="sec-h">Who is this for?</h2>
+    <p class="sec-desc">Name, address and date print at the top of the PDF.</p>
     <div class="grid2">
       <div class="field"><label for="clientName">Name</label><input type="text" id="clientName" placeholder="Client name" autocomplete="off"></div>
       <div class="field"><label for="clientDate">Date</label><input type="date" id="clientDate"></div>
@@ -470,16 +589,22 @@
     </div>
   </section>
 
+  <section class="sec-head">
+    <div class="eyebrow">Services</div>
+    <h2 class="sec-h">What we&rsquo;re quoting</h2>
+    <p class="sec-desc">Tap a service to enter counts. Totals update as you go.</p>
+    <button class="btn btn-blue" id="addServiceBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    Add service
+  </button>
+  </section>
+
   <div id="svcList"></div>
 
   <div class="footer-bar">
-    <button class="btn btn-ghost" id="savedBtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      Saved estimates
-    </button>
-    <button class="btn btn-ghost" id="masterBtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Master rates &amp; settings
+    <button class="btn btn-ghost" id="saveNowBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+      Save
     </button>
     <button class="btn btn-accent" id="exportBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
@@ -512,6 +637,39 @@
   </div>
 </div>
 
+<!-- Top menu -->
+<div class="scrim" id="topMenuScrim" role="dialog" aria-modal="true" aria-labelledby="topMenuTitle">
+  <div class="dialog">
+    <div class="dialog-head">
+      <h3 id="topMenuTitle">Menu</h3>
+      <button class="icon-btn" id="topMenuClose" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="dialog-body">
+      <button class="menu-item" id="newEstimateBtn">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6M9 15h6"/></svg></span>
+        <span class="mi-text">New estimate<small>Clear the form and start over</small></span>
+      </button>
+      <button class="menu-item" id="savedBtn">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="mi-text">Saved estimates<small>Shared with the whole team</small></span>
+      </button>
+      <button class="menu-item" id="masterBtn">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        <span class="mi-text">Master rates &amp; settings<small>Shared with the whole team</small></span>
+      </button>
+      <div class="who-line">
+  <span class="who-k">Signed in as<span id="whoEmail" style="font-size:13px;color:var(--text-tertiary)"></span></span>
+  <button class="signout-btn" id="signOutBtn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    Sign out
+  </button>
+</div>
+    </div>
+  </div>
+</div>
+
 <!-- Saved estimates dialog -->
 <div class="scrim" id="savedScrim" role="dialog" aria-modal="true" aria-labelledby="savedTitle">
   <div class="dialog">
@@ -522,10 +680,6 @@
       </button>
     </div>
     <div class="dialog-body" id="savedBody"></div>
-    <div class="dialog-foot">
-      <button class="btn btn-neutral" id="newEstimateBtn">Start new</button>
-      <button class="btn btn-primary" id="saveNowBtn">Save this estimate</button>
-    </div>
   </div>
 </div>
 
@@ -1185,7 +1339,7 @@ function render(){
       return '<section class="svc" data-svc="'+s.id+'">'+
         '<button class="svc-head" data-act="toggle" aria-expanded="'+(s.open?'true':'false')+'">'+
           '<span class="ico">'+meta.icon+'</span>'+
-          '<span class="name">'+meta.label+'</span>'+
+          '<span class="name">'+meta.label+'<small>'+meta.blurb+'</small></span>'+
           '<span class="sum" data-sum>'+fmt(svcTotal(s))+'</span>'+
           I.chev+
         '</button>'+
@@ -1223,7 +1377,32 @@ function updateTotals(){
   document.getElementById('svcCount').textContent = services.length
     ? services.length + ' service' + (services.length===1?'':'s')
     : 'No services added';
+  updateHero();
   if(typeof saveDraft === 'function') saveDraft();
+}
+
+/* hero headline + stats, mirrors the report layout */
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function updateHero(){
+  var name = document.getElementById('clientName').value.trim();
+  var addr = document.getElementById('clientAddress').value.trim();
+  var prep = document.getElementById('preparedBy').value.trim();
+  var iso = document.getElementById('clientDate').value;
+  var p = iso ? iso.split('-') : [];
+  var dateTxt = p.length === 3 ? MONTHS[+p[1]-1] + ' ' + (+p[2]) + ', ' + p[0] : '';
+  var kind = (typeof currentSavedId !== 'undefined' && currentSavedId) ? 'Saved estimate' : 'Draft estimate';
+  document.getElementById('heroKicker').textContent = kind + (dateTxt ? ' · ' + dateTxt : '');
+  document.getElementById('heroTitle').innerHTML = name
+    ? 'Estimate for <em>' + esc(name) + '</em>'
+    : 'Start a new <em>estimate</em>.';
+  var sub = [];
+  if(addr) sub.push(esc(addr));
+  if(prep) sub.push('Prepared by ' + esc(prep));
+  document.getElementById('heroSub').innerHTML = sub.length ? sub.join(' &middot; ') : 'Add the client, then build the quote one service at a time.';
+  var g = services.reduce(function(a,s){ return a + svcTotal(s); },0);
+  document.getElementById('heroTotal').textContent = fmt(g);
+  document.getElementById('heroCount').textContent = services.length;
+  document.getElementById('heroCountLbl').textContent = services.length === 1 ? 'Service quoted' : 'Services quoted';
 }
 
 /* Update the money on screen without rebuilding the DOM, so a field
@@ -1549,7 +1728,10 @@ function openMaster(){
   masterScrim.classList.add('open');
 }
 function closeMaster(){ masterScrim.classList.remove('open'); }
-document.getElementById('masterBtn').addEventListener('click', openMaster);
+document.getElementById('masterBtn').addEventListener('click', function(){
+  topMenuScrim.classList.remove('open');
+  openMaster();
+});
 document.getElementById('masterClose').addEventListener('click', closeMaster);
 document.getElementById('masterCancel').addEventListener('click', closeMaster);
 masterScrim.addEventListener('click', function(e){ if(e.target === masterScrim) closeMaster(); });
@@ -1625,6 +1807,7 @@ function applySnapshot(snap){
 
 var saveTimer = null;
 function saveDraft(){
+  updateHero();
   if(!storageOK){ setStatus('Not saved. This browser is blocking local storage.', true); return; }
   clearTimeout(saveTimer);
   saveTimer = setTimeout(function(){
@@ -1746,8 +1929,15 @@ function renderSavedList(){
   }).join('');
 }
 
+/* ============ top menu ============ */
+var topMenuScrim = document.getElementById('topMenuScrim');
+document.getElementById('topMenuBtn').addEventListener('click', function(){ topMenuScrim.classList.add('open'); });
+document.getElementById('topMenuClose').addEventListener('click', function(){ topMenuScrim.classList.remove('open'); });
+topMenuScrim.addEventListener('click', function(e){ if(e.target === topMenuScrim) topMenuScrim.classList.remove('open'); });
+
 var savedScrim = document.getElementById('savedScrim');
 document.getElementById('savedBtn').addEventListener('click', function(){
+  topMenuScrim.classList.remove('open');
   renderSavedList(); savedScrim.classList.add('open');
 });
 document.getElementById('savedClose').addEventListener('click', function(){ savedScrim.classList.remove('open'); });
@@ -1755,6 +1945,7 @@ savedScrim.addEventListener('click', function(e){ if(e.target === savedScrim) sa
 document.getElementById('saveNowBtn').addEventListener('click', saveEstimate);
 
 document.getElementById('newEstimateBtn').addEventListener('click', function(){
+  topMenuScrim.classList.remove('open');
   if(services.length && !confirm('Start a new estimate?\n\nAnything not saved will be cleared.')) return;
   services = []; nextSvcId = 1; currentSavedId = null;
   document.getElementById('clientName').value = '';
@@ -1790,8 +1981,8 @@ document.getElementById('savedBody').addEventListener('click', function(e){
 
 /* autosave on client field edits */
 CLIENT_FIELDS.forEach(function(id){
-  document.getElementById(id).addEventListener('input', saveDraft);
-  document.getElementById(id).addEventListener('change', saveDraft);
+  document.getElementById(id).addEventListener('input', function(){ updateHero(); saveDraft(); });
+  document.getElementById(id).addEventListener('change', function(){ updateHero(); saveDraft(); });
 });
 
 /* ============ date field ============ */
