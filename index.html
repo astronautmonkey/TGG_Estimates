@@ -385,9 +385,60 @@
   }
 
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+  /* auth gate */
+  #app-shell{display:none;}
+  .auth-gate{
+    position:fixed; inset:0; z-index:100; background:var(--bg-secondary);
+    display:flex; align-items:center; justify-content:center; padding:var(--sp-400);
+  }
+  .auth-card{
+    background:var(--bg-default); border:1px solid var(--border-default); border-radius:var(--radius);
+    width:100%; max-width:360px; padding:var(--sp-600) var(--sp-400);
+  }
+  .auth-card .brand{justify-content:center; margin-bottom:var(--sp-600);}
+  .auth-card .brand .logo{width:64px;}
+  .auth-card h2{font-size:18px;margin:0 0 var(--sp-400);text-align:center;font-weight:600;}
+  .auth-err{
+    display:none; background:var(--bg-danger); color:var(--text-danger); border-radius:var(--radius);
+    padding:var(--sp-300); font-size:14px; margin-bottom:var(--sp-400);
+  }
+  .auth-err.show{display:block;}
+  .auth-card .btn{width:100%;justify-content:center;margin-top:var(--sp-300);}
+  .signout-btn{
+    display:flex; align-items:center; gap:6px; background:none; border:none; color:var(--text-tertiary);
+    font-family:inherit; font-size:13px; cursor:pointer; padding:var(--sp-100) var(--sp-200);
+  }
+  .signout-btn:hover{color:var(--text-default);}
+  .who-line{display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-200);padding:6px var(--sp-400) 0;max-width:760px;margin:0 auto;}
 </style>
 </head>
 <body>
+
+<!-- Sign-in gate -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-card">
+    <div class="brand">
+      <div class="logo" aria-label="Two Glass Gents">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 309.08 167.9" fill="currentColor" role="img"><title>Two Glass Gents</title><path d="M121.42,156.83c1.41,7.38-1.7,11.07-9.36,11.07-4.83,0-7.74-2.48-8.73-7.45l-13.41-69.59c-1.42-7.79-6.24-11.7-14.47-11.7h-28.94c-8.23,0-13.12,3.91-14.69,11.7l-13.4,69.59c-.85,4.97-3.76,7.45-8.72,7.45-7.66,0-10.79-3.69-9.37-11.07l13.41-69.37c1.41-7.79,5.21-14.22,11.38-19.26,6.17-5.03,13.3-7.55,21.39-7.55h28.94c7.95,0,15,2.52,21.18,7.55,6.17,5.04,10.03,11.46,11.59,19.26l13.19,69.37ZM81.52,8.51C75.78,2.84,68.92,0,60.99,0s-14.97,2.84-20.65,8.51c-5.68,5.68-8.52,12.56-8.52,20.64,0,6.81,2.2,12.98,6.6,18.51,1.7,2.27,4.04,3.41,7.02,3.41,5.82,0,8.73-2.9,8.73-8.72,0-2.13-.82-4.15-2.44-6.07-1.64-1.91-2.45-4.28-2.45-7.13,0-7.8,3.9-11.71,11.71-11.71s11.69,3.91,11.69,11.71c0,2.84-.82,5.21-2.45,7.13-1.63,1.91-2.44,3.94-2.44,6.07,0,5.82,2.9,8.72,8.72,8.72,2.84,0,5.17-1.14,7.01-3.41,4.41-5.53,6.6-11.71,6.6-18.51,0-8.09-2.87-14.97-8.61-20.64ZM295.55,87.46c-1.56-7.79-5.43-14.22-11.59-19.26-6.17-5.03-13.23-7.55-21.18-7.55h-28.94c-8.09,0-15.22,2.52-21.39,7.55-6.17,5.04-9.97,11.46-11.38,19.26l-13.41,69.37c-1.42,7.38,1.7,11.07,9.36,11.07,4.96,0,7.88-2.48,8.72-7.45l13.41-69.59c1.56-7.79,6.46-11.7,14.68-11.7h28.94c8.23,0,13.06,3.91,14.47,11.7l13.41,69.59c.99,4.97,3.9,7.45,8.73,7.45,7.66,0,10.78-3.69,9.36-11.07l-13.2-69.37ZM268.84,8.51c-5.75-5.67-12.59-8.51-20.53-8.51s-14.97,2.84-20.64,8.51c-5.67,5.68-8.52,12.56-8.52,20.64,0,6.81,2.21,12.98,6.6,18.51,1.7,2.27,4.05,3.41,7.03,3.41,5.82,0,8.73-2.9,8.73-8.72,0-2.13-.82-4.15-2.45-6.07-1.63-1.91-2.45-4.28-2.45-7.13,0-7.8,3.91-11.71,11.71-11.71s11.7,3.91,11.7,11.71c0,2.84-.82,5.21-2.45,7.13-1.62,1.91-2.44,3.94-2.44,6.07,0,5.82,2.9,8.72,8.73,8.72,2.84,0,5.18-1.14,7.02-3.41,4.4-5.53,6.61-11.71,6.61-18.51,0-8.09-2.88-14.97-8.63-20.64Z"/></svg>
+      </div>
+    </div>
+    <h2>Sign in to Estimates</h2>
+    <div class="auth-err" id="authErr"></div>
+    <div class="field"><label for="authEmail">Email</label><input type="email" id="authEmail" autocomplete="username" placeholder="you@twoglassgents.com"></div>
+    <div class="field"><label for="authPass">Password</label><input type="password" id="authPass" autocomplete="current-password" placeholder="Password"></div>
+    <button class="btn btn-primary" id="authSubmit">Sign in</button>
+  </div>
+</div>
+
+<div id="app-shell">
+<div class="who-line">
+  <span id="whoEmail" style="font-size:13px;color:var(--text-tertiary)"></span>
+  <button class="signout-btn" id="signOutBtn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    Sign out
+  </button>
+</div>
 <div class="wrap">
 
   <header>
@@ -542,7 +593,71 @@
   </div>
 </div>
 
+</div><!-- /app-shell -->
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+
 <script>
+/* ============ firebase (shared saved estimates + master rates) ============ */
+/* Fill these in from Firebase Console > Project settings > General > Your apps > SDK setup and configuration */
+var firebaseConfig = {
+  apiKey: "AIzaSyDu6gGzhqY3tDVmGTm2J0KetiwHhfOcyr0",
+  authDomain: "tgg-estimates.firebaseapp.com",
+  projectId: "tgg-estimates",
+  storageBucket: "tgg-estimates.firebasestorage.app",
+  messagingSenderId: "940773435091",
+  appId: "1:940773435091:web:f203f8e0d7fc2cb322d626"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.firestore();
+var currentUser = null;
+
+function showAuthErr(msg){
+  var el = document.getElementById('authErr');
+  el.textContent = msg; el.classList.add('show');
+}
+function clearAuthErr(){ document.getElementById('authErr').classList.remove('show'); }
+function doSignIn(){
+  clearAuthErr();
+  var email = document.getElementById('authEmail').value.trim();
+  var pass = document.getElementById('authPass').value;
+  if(!email || !pass){ showAuthErr('Enter your email and password.'); return; }
+  var btn = document.getElementById('authSubmit');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  auth.signInWithEmailAndPassword(email, pass).catch(function(err){
+    btn.disabled = false; btn.textContent = 'Sign in';
+    showAuthErr(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
+      ? 'Incorrect email or password.' : 'Could not sign in — ' + err.message);
+  });
+}
+document.getElementById('authSubmit').addEventListener('click', doSignIn);
+['authEmail','authPass'].forEach(function(id){
+  document.getElementById(id).addEventListener('keydown', function(e){ if(e.key === 'Enter') doSignIn(); });
+});
+document.getElementById('signOutBtn').addEventListener('click', function(){ auth.signOut(); });
+
+auth.onAuthStateChanged(function(user){
+  currentUser = user;
+  var gate = document.getElementById('authGate'), shell = document.getElementById('app-shell');
+  if(user){
+    gate.style.display = 'none';
+    shell.style.display = 'block';
+    document.getElementById('whoEmail').textContent = user.email || '';
+    var btn = document.getElementById('authSubmit');
+    btn.disabled = false; btn.textContent = 'Sign in';
+    document.getElementById('authPass').value = '';
+    boot();
+  } else {
+    gate.style.display = 'flex';
+    shell.style.display = 'none';
+    if(unsubEstimates){ unsubEstimates(); unsubEstimates = null; }
+    if(unsubRates){ unsubRates(); unsubRates = null; }
+  }
+});
+
 /* ============ icons ============ */
 var I = {
   minus:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>',
@@ -608,8 +723,8 @@ var DEFAULTS = {
   window:{
     data:{ types:[], mirrors:0, skylights:0, nextTypeId:1 },
     rates:{ r1:7, r2:9, r3:11, xl:1.5, g1:2, g2:2.5, g3:3,
-            dh:0, csmt:0, snap:3, storm:3, pella:4,
-            interiorPct:60, screen:2, mirror:5, skylight:20 }
+            dh:7, csmt:3, snap:3, storm:3, pella:4,
+            interiorPct:70, screen:2, mirror:5, skylight:20 }
   },
   soft:{ data:{ sqft:'', garage:'None', acc:'None', accQty:0 },
          rates:{ perSqft:0.25, garAttached:75, garDetached:125,
@@ -1447,13 +1562,20 @@ document.getElementById('masterApply').addEventListener('click', function(){
   if(!masterDraft) return closeMaster();
   Object.keys(masterDraft).forEach(function(k){ DEFAULTS[k].rates = clone(masterDraft[k]); });
   services.forEach(function(s){ s.rates = clone(DEFAULTS[s.type].rates); });
-  storeRates();
-  closeMaster(); render();
-  setStatus('Master rates saved to this device \u00b7 ' + timeNow());
+  var btn = document.getElementById('masterApply');
+  btn.disabled = true;
+  storeRates().then(function(){
+    closeMaster(); render();
+    setStatus('Master rates saved for the whole team \u00b7 ' + timeNow());
+  }).catch(function(e){
+    alert('Could not save master rates. ' + e.message);
+  }).finally(function(){ btn.disabled = false; });
 });
 
 /* ============ persistence ============ */
-var STORE = { draft:'tgg.est.draft.v1', saved:'tgg.est.saved.v1', rates:'tgg.est.rates.v1' };
+/* Draft (in-progress estimate) autosaves to this device only, via localStorage.
+   Saved estimates and master rates are shared across the whole team, via Firestore. */
+var STORE = { draft:'tgg.est.draft.v1' };
 
 var storageOK = (function(){
   try { var k='__tgg_test'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }
@@ -1524,9 +1646,9 @@ function setStatus(msg, warn){
     ) + '<span>' + msg + '</span>';
 }
 
-/* persist master rates separately so they survive across estimates */
-function loadStoredRates(){
-  var stored = lsGet(STORE.rates, null);
+/* master rates: one shared Firestore doc, live-synced to every signed-in device */
+var unsubRates = null;
+function applyRatesDoc(stored){
   if(!stored) return;
   Object.keys(DEFAULTS).forEach(function(k){
     if(!stored[k]) return;
@@ -1535,56 +1657,77 @@ function loadStoredRates(){
     });
   });
 }
+function loadStoredRates(){
+  return db.collection('settings').doc('masterRates').get().then(function(doc){
+    applyRatesDoc(doc.exists ? doc.data() : null);
+  }).catch(function(e){ console.error('Could not load master rates', e); });
+}
+function watchRates(){
+  if(unsubRates) unsubRates();
+  unsubRates = db.collection('settings').doc('masterRates').onSnapshot(function(doc){
+    if(doc.exists){ applyRatesDoc(doc.data()); render(); }
+  }, function(e){ console.error('rates listener failed', e); });
+}
 function storeRates(){
   var out = {};
   Object.keys(DEFAULTS).forEach(function(k){ out[k] = clone(DEFAULTS[k].rates); });
-  lsSet(STORE.rates, out);
+  return db.collection('settings').doc('masterRates').set(out);
 }
 
-/* saved estimates library */
-function getSaved(){ var a = lsGet(STORE.saved, []); return Array.isArray(a) ? a : []; }
-function putSaved(a){ return lsSet(STORE.saved, a); }
+/* saved estimates library: shared Firestore collection, live-synced */
+var unsubEstimates = null;
+var savedCache = [];
+var estimatesLoaded = false;
+function watchEstimates(){
+  if(unsubEstimates) unsubEstimates();
+  unsubEstimates = db.collection('estimates').orderBy('savedAt','desc').onSnapshot(function(snap){
+    savedCache = snap.docs.map(function(d){ return d.data(); });
+    estimatesLoaded = true;
+    renderSavedList();
+  }, function(e){
+    console.error('estimates listener failed', e);
+    estimatesLoaded = true;
+    renderSavedList();
+  });
+}
 
 function estimateLabel(){
   var nm = document.getElementById('clientName').value.trim();
   return nm || 'Untitled estimate';
 }
 function saveEstimate(){
-  if(!storageOK){ alert('This browser is blocking local storage, so estimates cannot be saved here.\n\nOpen the tool at its own web address rather than inside another page.'); return; }
-  var list = getSaved();
   var snap = snapshot();
   var total = services.reduce(function(a,s){ return a + svcTotal(s); },0);
+  var id = currentSavedId || ('e' + Date.now());
   var rec = {
-    id: currentSavedId || ('e' + Date.now()),
+    id: id,
     label: estimateLabel(),
     address: document.getElementById('clientAddress').value.trim(),
     date: document.getElementById('clientDate').value,
     total: total,
     savedAt: Date.now(),
+    savedBy: (currentUser && currentUser.email) || '',
     payload: snap
   };
-  var idx = list.findIndex(function(x){ return x.id === rec.id; });
-  if(idx >= 0) list[idx] = rec; else list.unshift(rec);
-  currentSavedId = rec.id;
-  rec.payload.currentSavedId = rec.id;
-  if(putSaved(list)){
+  currentSavedId = id;
+  rec.payload.currentSavedId = id;
+  var btn = document.getElementById('saveNowBtn');
+  btn.disabled = true;
+  db.collection('estimates').doc(id).set(rec).then(function(){
     saveDraft();
-    renderSavedList();
     setStatus('Estimate saved \u00b7 ' + timeNow());
-  } else {
-    alert('Could not save. Device storage may be full.');
-  }
+  }).catch(function(e){
+    alert('Could not save. ' + e.message);
+  }).finally(function(){ btn.disabled = false; });
 }
 
 function renderSavedList(){
-  var list = getSaved().sort(function(a,b){ return b.savedAt - a.savedAt; });
   var body = document.getElementById('savedBody');
-  if(!storageOK){
-    body.innerHTML = '<div class="master-note" style="background:var(--bg-danger);border-color:var(--border-danger,#eb5757);color:var(--text-danger)">'+
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>'+
-      '<span>This browser is blocking local storage, so saving is unavailable here. It works when the tool is opened at its own web address.</span></div>';
+  if(!estimatesLoaded){
+    body.innerHTML = '<div class="saved-empty">Loading saved estimates\u2026</div>';
     return;
   }
+  var list = savedCache;
   if(!list.length){
     body.innerHTML = '<div class="saved-empty">No saved estimates yet.<br>Tap <strong>Save this estimate</strong> below to keep the current one.</div>';
     return;
@@ -1593,9 +1736,10 @@ function renderSavedList(){
     var d = new Date(r.savedAt);
     var when = (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
     var svcN = (r.payload && r.payload.services ? r.payload.services.length : 0);
+    var who = r.savedBy ? esc(r.savedBy.split('@')[0]) + ' \u00b7 ' : '';
     return '<div class="saved-item'+(r.id===currentSavedId?' current':'')+'">'+
       '<button class="saved-load" data-load="'+r.id+'">'+esc(r.label)+
-        '<small>'+(r.address?esc(r.address)+' \u00b7 ':'')+svcN+' service'+(svcN===1?'':'s')+' \u00b7 saved '+when+'</small></button>'+
+        '<small>'+(r.address?esc(r.address)+' \u00b7 ':'')+svcN+' service'+(svcN===1?'':'s')+' \u00b7 '+who+when+'</small></button>'+
       '<span class="saved-amt">'+fmt(r.total||0)+'</span>'+
       '<button class="mini-remove" data-del="'+r.id+'" aria-label="Delete estimate">'+I.trash+'</button>'+
     '</div>';
@@ -1624,7 +1768,7 @@ document.getElementById('newEstimateBtn').addEventListener('click', function(){
 document.getElementById('savedBody').addEventListener('click', function(e){
   var loadBtn = e.target.closest('[data-load]');
   if(loadBtn){
-    var rec = getSaved().find(function(x){ return x.id === loadBtn.dataset.load; });
+    var rec = savedCache.find(function(x){ return x.id === loadBtn.dataset.load; });
     if(rec && applySnapshot(rec.payload)){
       currentSavedId = rec.id;
       savedScrim.classList.remove('open');
@@ -1636,11 +1780,11 @@ document.getElementById('savedBody').addEventListener('click', function(e){
   var delBtn = e.target.closest('[data-del]');
   if(delBtn){
     var id = delBtn.dataset.del;
-    var rec2 = getSaved().find(function(x){ return x.id === id; });
+    var rec2 = savedCache.find(function(x){ return x.id === id; });
     if(!confirm('Delete "' + (rec2 ? rec2.label : 'this estimate') + '"? This cannot be undone.')) return;
-    putSaved(getSaved().filter(function(x){ return x.id !== id; }));
-    if(currentSavedId === id) currentSavedId = null;
-    renderSavedList();
+    db.collection('estimates').doc(id).delete().then(function(){
+      if(currentSavedId === id) currentSavedId = null;
+    }).catch(function(e){ alert('Could not delete. ' + e.message); });
   }
 });
 
@@ -1763,26 +1907,33 @@ function exportPDF(){
 document.getElementById('exportBtn').addEventListener('click', exportPDF);
 
 /* ============ boot ============ */
-(function boot(){
-  loadStoredRates();
+/* Called from auth.onAuthStateChanged once someone signs in (see top of this script). */
+var booted = false;
+function boot(){
   setToday();
 
-  var draft = lsGet(STORE.draft, null);
-  var restored = false;
-  if(draft && draft.services && (draft.services.length || (draft.client && draft.client.clientName))){
-    restored = applySnapshot(draft);
-  }
+  loadStoredRates().then(function(){
+    watchRates();
+    watchEstimates();
 
-  render();
+    var draft = lsGet(STORE.draft, null);
+    var restored = false;
+    if(draft && draft.services && (draft.services.length || (draft.client && draft.client.clientName))){
+      restored = applySnapshot(draft);
+    }
 
-  if(!storageOK){
-    setStatus('Not saving. This browser is blocking local storage.', true);
-  } else if(restored){
-    setStatus('Picked up where you left off');
-  } else {
-    setStatus('Saves to this device automatically');
-  }
-})();
+    render();
+
+    if(!storageOK){
+      setStatus('Signed in · this browser is blocking local storage, so the in-progress draft won’t autosave here (saved estimates still will).', true);
+    } else if(restored){
+      setStatus('Picked up where you left off');
+    } else {
+      setStatus('Signed in · saves for the whole team');
+    }
+    booted = true;
+  });
+}
 </script>
 </body>
 </html>
